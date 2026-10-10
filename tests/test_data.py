@@ -48,6 +48,17 @@ def test_unified_item(name, mode):
 PROTOCOL_FILES = ["protocol_A", "protocol_B", "protocol_B_strict"] + [p.stem for p in sorted((ROOT / "splits").glob("protocol_C_*.json"))]
 
 
+@pytest.mark.skipif(not {"gdcld", "l4s"} <= set(NAMES), reason="needs gdcld and l4s")
+def test_mixed_resolution_batches_share_one_size_with_crop():
+    """Cross-dataset training mixes 256 px (gdcld) and 128 px (l4s) tiles: a 128 crop must make every item 128x128 (keeping GSD)."""
+    ds = data.LandslideDataset([("gdcld", 0), ("l4s", 0), ("gdcld", 1), ("l4s", 1)], mode="rgb", augment=True, crop=128)
+    shapes = {ds[i]["image"].shape for i in range(len(ds))}
+    assert shapes == {(3, 128, 128)}
+    assert all(ds[i]["mask"].shape == (128, 128) for i in range(len(ds)))
+    ev = data.LandslideDataset([("gdcld", 0)], mode="rgb", augment=False, crop=128)       # evaluation: never cropped
+    assert ev[0]["image"].shape == (3, 256, 256)
+
+
 @pytest.mark.parametrize("proto", PROTOCOL_FILES)
 def test_no_split_overlap(proto):
     f = ROOT / "splits" / f"{proto}.json"
