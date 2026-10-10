@@ -1,0 +1,3 @@
+[
+  {"config": "configs/smoke_l4s_unet.yaml", "seeds": [0], "timeout_s": 900}
+]

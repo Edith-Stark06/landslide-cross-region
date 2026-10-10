@@ -1,13 +1,14 @@
 # Stage the code dataset for Kaggle (src, splits, configs, jobs.json, GIT_HASH) in .cache/code_pkg.
 # Usage: powershell -File scripts/pack_code.ps1 -Jobs '[{"config":"configs/smoke_l4s_unet.yaml","seeds":[0]}]'
-param([Parameter(Mandatory=$true)][string]$Jobs)
+param([Parameter(Mandatory=$true)][string]$JobsFile)   # path to a JSON file: [{"config": "...", "seeds": [0], "timeout_s": 900}]
 $root = Split-Path -Parent $PSScriptRoot
 $pkg = Join-Path $root ".cache\code_pkg"
 if (Test-Path $pkg) { Remove-Item $pkg -Recurse -Force }
 New-Item -ItemType Directory -Force -Path $pkg | Out-Null
 foreach ($d in 'src','splits','configs') { Copy-Item (Join-Path $root $d) (Join-Path $pkg $d) -Recurse }
 Get-ChildItem $pkg -Recurse -Directory -Filter __pycache__ | Remove-Item -Recurse -Force
-Set-Content (Join-Path $pkg "jobs.json") $Jobs -Encoding ascii
+$null = Get-Content $JobsFile -Raw | ConvertFrom-Json          # fail here, not on Kaggle, if the JSON is invalid
+Copy-Item $JobsFile (Join-Path $pkg "jobs.json")
 $hash = (git -C $root rev-parse HEAD 2>$null); $dirty = (git -C $root status --porcelain 2>$null)
 if (-not $hash) { $hash = "unknown" } elseif ($dirty) { $hash = "$hash-dirty" }
 Set-Content (Join-Path $pkg "GIT_HASH") $hash -Encoding ascii
