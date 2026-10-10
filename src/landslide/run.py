@@ -138,7 +138,7 @@ def main(argv=None) -> dict:
             loss = loss_fn(logits.float(), y)
             opt.zero_grad(set_to_none=True)
             scaler.scale(loss).backward(); scaler.step(opt); scaler.update()
-            tot += float(loss) * len(x); n += len(x)
+            tot += loss.item() * len(x); n += len(x)
         sched.step()
         v = evaluate(model, val, cfg, device)
         v_iou = float(np.mean([m["iou_landslide"] for m in v.values()]))
@@ -149,6 +149,7 @@ def main(argv=None) -> dict:
             best_ep = ep
     train_seconds = time.time() - t0
     model.load_state_dict(best_state)
+    n_test = len(test)
     test = evaluate(model, test, cfg, device)
 
     from torch.utils.flop_counter import FlopCounterMode
@@ -158,7 +159,7 @@ def main(argv=None) -> dict:
         model(torch.zeros(1, in_ch, h, h, device=device))
     result = dict(config=cfg, seed=seed, run_id=run_id, code_revision=code_revision(), torch=torch.__version__,
                   device=torch.cuda.get_device_name(0) if device.type == "cuda" else "cpu", n_params=n_params,
-                  gflops_at_input=fc.get_total_flops() / 2e9, input_hw=h, n_train=len(train), n_val=len(val), n_test=len(test),
+                  gflops_at_input=fc.get_total_flops() / 2e9, input_hw=h, n_train=len(train), n_val=len(val), n_test=n_test,
                   best_epoch=best_ep, best_val_iou=best, history=history, train_seconds=train_seconds, test=test)
     (out_dir / "result.json").write_text(json.dumps(result, indent=1))
     print(json.dumps({k: result["test"][k] for k in result["test"]}, indent=1))
