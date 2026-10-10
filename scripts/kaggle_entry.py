@@ -1,0 +1,53 @@
+"""Kaggle kernel entry point: runs the jobs listed in the code dataset's jobs.json on the kernel's GPU.
+
+Inputs (attached as private datasets): landslide-xr-code (src/, splits/, configs/, jobs.json, GIT_HASH) and
+landslide-xr-<dataset> for every dataset the jobs use. Outputs go to /kaggle/working/results (+ results.zip).
+"""
+import json
+import os
+import shutil
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+INPUT, WORK = Path("/kaggle/input"), Path("/kaggle/working")
+
+
+def find_dataset(slug: str) -> Path:
+    for p in INPUT.rglob("*"):
+        if p.is_dir() and p.name == slug:
+            return p
+    raise FileNotFoundError(f"dataset {slug} is not attached to this kernel")
+
+
+subprocess.run([sys.executable, "-m", "pip", "install", "-q", "segmentation-models-pytorch"], check=True)
+
+code = WORK / "code"
+if code.exists():
+    shutil.rmtree(code)
+shutil.copytree(find_dataset("landslide-xr-code"), code)
+jobs = json.loads((code / "jobs.json").read_text())
+
+proc = WORK / "processed"
+proc.mkdir(exist_ok=True)
+for d in INPUT.rglob("meta.csv"):                       # dataset dirs hold images.npy, masks.npy, meta.csv, stats.json
+    slug = d.parent.name
+    if slug.startswith("landslide-xr-") and not (proc / slug.removeprefix("landslide-xr-")).exists():
+        (proc / slug.removeprefix("landslide-xr-")).symlink_to(d.parent)
+print("datasets:", sorted(p.name for p in proc.iterdir()), flush=True)
+
+env = dict(os.environ, LANDSLIDE_PROCESSED=str(proc), PYTHONPATH=str(code / "src"),
+           GIT_HASH=(code / "GIT_HASH").read_text().strip() if (code / "GIT_HASH").exists() else "unknown")
+out = WORK / "results" / "runs"
+out.mkdir(parents=True, exist_ok=True)
+t0 = time.time()
+for job in jobs:
+    for seed in job["seeds"]:
+        print(f"=== {job['config']} seed {seed} (elapsed {time.time() - t0:.0f}s) ===", flush=True)
+        r = subprocess.run([sys.executable, "-m", "landslide.run", "--config", str(code / job["config"]), "--seed", str(seed), "--out", str(out)],
+                           env=env, cwd=code)
+        if r.returncode != 0:
+            print(f"!!! job failed: {job['config']} seed {seed} (exit {r.returncode}); continuing", flush=True)
+shutil.make_archive(str(WORK / "results"), "zip", WORK / "results")
+print("done; total seconds", time.time() - t0)

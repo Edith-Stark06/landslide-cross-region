@@ -1,0 +1,1 @@
+& 'D:\Documents\Research Work\Landslide Cross Region\.venv\Scripts\kaggle.exe' datasets create -p F:\LandslideData\processed\l4s *> 'D:\Documents\Research Work\Landslide Cross Region\results\upload_l4s.log'

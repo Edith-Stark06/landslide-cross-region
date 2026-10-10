@@ -1,0 +1,36 @@
+{
+  "_note": "Canonical physical events per dataset, used by protocol B-strict. basis = where the event list was read: 'paper' / 'readme' (documents read in verification_log.md) or 'inferred' (my reading of place names; treated conservatively as the SAME event when plausible). Datasets whose tiles carry no event id list their events at dataset level only ('tile_events': false), so B-strict drops them whole when any event overlaps.",
+  "l4s": {
+    "tile_events": false,
+    "events": ["hokkaido_2018", "kodagu_2018", "nepal_2015", "taitung_taiwan"],
+    "basis": "paper: Prithvi-EO-2.0 (arXiv 2412.02732) Sec. III-C2 names the four training sites Iburi-Tobu, Kodagu, Rasuwa, western Taitung County; mapping of sites to events is inferred"
+  },
+  "hrgldd": {
+    "tile_events": false,
+    "events": ["porgera_2018", "kodagu_2018", "rolante_2017", "haiti_2021", "nepal_2015", "hokkaido_2018", "wenchuan_2008", "sumatra_2022", "longchuan_2019", "hpaan_2018", "kaikoura_2016", "uvira_2020"],
+    "basis": "paper: ESSD 15, 3283 study-area sections (12 listed although the text says 10 events); event identity of Rasuwa=nepal_2015 and Tiburon=haiti_2021 is inferred"
+  },
+  "gdcld": {
+    "tile_events": false,
+    "events": ["jiuzhaigou_2017", "mainling_2017", "hokkaido_2018", "palu_2018", "mesetas_2019", "haiti_2021", "sumatra_2022", "lushan_2022", "luding_2022"],
+    "basis": "paper: ESSD 16, 4817 lists the nine events (Nippes 2021 mapped to haiti_2021, inferred). Only the 852 test crops carry an event label; train/val tiles do not"
+  },
+  "lmhld": {
+    "tile_events": true,
+    "group_to_event": {
+      "Emilia-Romagna_Italy": "emilia_2023", "Gorkha_Nepal": "nepal_2015", "Hokkaido_Japan": "hokkaido_2018",
+      "Jiuzhaigou_China": "jiuzhaigou_2017", "Rio de Janeiro_Brazil": "rio_2011", "Taiwan_China": "taitung_taiwan",
+      "Wenchuan_China": "wenchuan_2008"
+    },
+    "basis": "paper: arXiv 2502.19866 study-area list; Jiuzhaigou (paper says 2015) mapped to jiuzhaigou_2017 and Taiwan to taitung_taiwan conservatively (inferred)"
+  },
+  "cas": {
+    "tile_events": true,
+    "group_to_event": {
+      "Hokkaido Iburi-Tobu": "hokkaido_2018", "Jiuzhai valley": "jiuzhaigou_2017", "Lombok": "lombok",
+      "Longxi River": "longxi_river", "Mengdong Township": "mengdong", "Moxi town": "luding_2022",
+      "Moxitaidi": "luding_2022", "Palu": "palu_2018", "Tiburon Peninsula": "haiti_2021", "Wenchuan": "wenchuan_2008"
+    },
+    "basis": "readme: CAS README sub-dataset table; Moxi town / Moxitaidi mapped to luding_2022 conservatively (inferred, acquisition 2022.09-10 in Sichuan)"
+  }
+}

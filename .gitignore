@@ -1,0 +1,10 @@
+.venv/
+.cache/
+results/runs/
+results/*.log
+results/*.out
+results/*.err
+__pycache__/
+*.pyc
+data/
+

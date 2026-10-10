@@ -1,0 +1,1 @@
+& 'D:\Documents\Research Work\Landslide Cross Region\.venv\Scripts\kaggle.exe' datasets create -p F:\LandslideData\processed\gdcld *> 'D:\Documents\Research Work\Landslide Cross Region\results\upload_gdcld.log'

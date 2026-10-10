@@ -1,0 +1,33 @@
+protocol,fold,n_train,n_val,n_test,ref_overlap_train_test,ref_overlap_val_test,ref_overlap_train_val,groups_straddling_train_test,n_unknown_group_tiles_in_test,identical_tiles_train_test,shared_events_train_test
+A,cas,14687,3050,3128,0,0,0,0,0,0,
+A,gdcld,11162,4459,852,0,0,0,0,0,1,
+A,hrgldd,1119,284,355,0,0,0,0,355,0,
+A,l4s,3799,245,800,0,0,0,0,800,0,
+A,lmhld,17753,5072,2540,0,0,0,7,0,0,
+B,holdout_cas,33833,10060,20865,0,0,0,0,0,0,
+B,holdout_gdcld,37358,8651,16473,0,0,0,0,15621,0,
+B,holdout_hrgldd,47401,12826,1758,0,0,0,0,1758,0,
+B,holdout_l4s,44721,12865,4844,0,0,0,0,4844,0,
+B,holdout_lmhld,30767,8038,25365,0,0,0,0,0,0,
+B_strict,holdout_cas,12678,3622,20865,0,0,0,0,0,0,0.0
+B_strict,holdout_gdcld,19209,4142,16473,0,0,0,0,15621,0,0.0
+B_strict,holdout_hrgldd,25014,5494,1758,0,0,0,0,1758,0,0.0
+B_strict,holdout_l4s,21566,5439,4844,0,0,0,0,4844,0,0.0
+B_strict,holdout_lmhld,5526,3050,25365,0,0,0,0,0,0,0.0
+C:cas,holdout_Hokkaido Iburi-Tobu,11704,7677,1484,0,0,0,0,0,0,
+C:cas,holdout_Jiuzhai valley,12752,436,7677,0,0,0,0,0,0,
+C:cas,holdout_Lombok,16156,4273,436,0,0,0,0,0,0,
+C:cas,holdout_Longxi River,15437,1155,4273,0,0,0,0,0,0,
+C:cas,holdout_Mengdong Township,17915,1795,1155,0,0,0,0,0,0,
+C:cas,holdout_Moxi town,16951,2119,1795,0,0,0,0,0,0,
+C:cas,holdout_Moxitaidi,17929,817,2119,0,0,0,0,0,0,
+C:cas,holdout_Palu,19117,931,817,0,0,0,0,0,0,
+C:cas,holdout_Tiburon Peninsula,19756,178,931,0,0,0,0,0,0,
+C:cas,holdout_Wenchuan,19203,1484,178,0,0,0,0,0,0,
+C:lmhld,holdout_Emilia-Romagna_Italy,15464,3972,5929,0,0,0,0,0,0,
+C:lmhld,holdout_Gorkha_Nepal,19478,1915,3972,0,0,0,0,0,0,
+C:lmhld,holdout_Hokkaido_Japan,20716,2734,1915,0,0,0,0,0,0,
+C:lmhld,holdout_Jiuzhaigou_China,21948,683,2734,0,0,0,0,0,0,
+C:lmhld,holdout_Rio de Janeiro_Brazil,17153,7529,683,0,0,0,0,0,0,
+C:lmhld,holdout_Taiwan_China,15233,2603,7529,0,0,0,0,0,0,
+C:lmhld,holdout_Wenchuan_China,16833,5929,2603,0,0,0,0,0,0,

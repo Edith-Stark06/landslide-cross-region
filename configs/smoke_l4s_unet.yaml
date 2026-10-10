@@ -1,0 +1,15 @@
+# Pipeline smoke test: a few tiles, 2 epochs. Numbers from this config are NOT results.
+name: smoke_l4s_unet
+protocol: protocol_A
+fold: l4s
+model: unet
+encoder: resnet34
+mode: native
+pretrained: true
+epochs: 2
+batch_size: 16
+lr: 0.0003
+max_train: 256
+max_eval: 128
+num_workers: 2
+seed: 0

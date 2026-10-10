@@ -1,0 +1,14 @@
+# Step 3 reproduction: Landslide4Sense, all 14 bands, official train/val/test (Zenodo release, test masks included).
+name: baseline_l4s_unet
+protocol: protocol_A
+fold: l4s
+model: unet
+encoder: resnet34
+mode: native
+pretrained: true
+epochs: 50
+batch_size: 32
+lr: 0.0003
+weight_decay: 0.0001
+num_workers: 2
+seed: 0
