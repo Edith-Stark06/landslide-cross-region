@@ -1,0 +1,4 @@
+name,test_dataset,mIoU,IoU_landslide,F1,precision,recall,PR_AUC,ECE,mIoU_std,IoU_landslide_std,F1_std,precision_std,recall_std,PR_AUC_std,ECE_std,n_seeds
+baseline_l4s_deeplabv3plus,l4s,71.862,45.271,62.326,58.319,66.925,0.636,0.011,,,,,,,,1
+baseline_l4s_segformer_b0,l4s,72.57,46.705,63.672,57.308,71.626,0.657,0.01,,,,,,,,1
+baseline_l4s_unet,l4s,73.329,48.045,64.906,62.854,67.097,0.673,0.01,,,,,,,,1

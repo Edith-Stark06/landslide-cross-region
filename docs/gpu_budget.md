@@ -9,5 +9,9 @@ deleted, so its true quota use is unknown and is counted below as the worst case
 |---|---|---|---|---|
 | 2026-10-10/11 | smoke (hung, deleted) | 1 | unknown, up to ~6 h before deletion | <= 6 h (worst case) |
 | 2026-10-11 | smoke2, smoke3 | 2 | ~0.05 h | |
+| 2026-10-11 | l4s-baselines (U-Net, DeepLabV3+, SegFormer-B0, 50 ep, 1 seed each) | 3 | 1572 s job time + ~1 min start-up = ~0.45 h (estimate was 1.5-2.5 h; actual training 458-574 s per model) | ~0.5 h + the hung smoke (<= 6 h) |
+
+Measured throughput (T4, AMP, batch 32): L4S 128 px, 3,799 tiles -> ~9-11 s/epoch. Extrapolation to GDCLD (256 px, 11,162 tiles,
+~12x the pixels) is ~2 min/epoch -> ~40 min per 20-epoch run: an estimate until measured.
 
 Rule: no kernel is launched without writing its estimated hours here first; the remaining budget is re-checked after each.
