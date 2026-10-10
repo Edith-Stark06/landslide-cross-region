@@ -21,7 +21,18 @@ def find_dataset(slug: str) -> Path:
     raise FileNotFoundError(f"dataset {slug} is not attached to this kernel")
 
 
-subprocess.run([sys.executable, "-m", "pip", "install", "-q", "segmentation-models-pytorch"], check=True)
+def stage(msg):
+    print(f"[entry {time.strftime('%H:%M:%S')}] {msg}", flush=True)
+
+
+stage("start")
+subprocess.run(["nvidia-smi", "-L"], check=False, timeout=60)
+try:
+    subprocess.run([sys.executable, "-m", "pip", "install", "-q", "segmentation-models-pytorch"], check=True, timeout=600)
+except subprocess.TimeoutExpired:
+    stage("pip install timed out (internet unavailable?)")
+    raise
+stage("pip done")
 
 code = WORK / "code"
 if code.exists():
@@ -45,9 +56,12 @@ t0 = time.time()
 for job in jobs:
     for seed in job["seeds"]:
         print(f"=== {job['config']} seed {seed} (elapsed {time.time() - t0:.0f}s) ===", flush=True)
-        r = subprocess.run([sys.executable, "-m", "landslide.run", "--config", str(code / job["config"]), "--seed", str(seed), "--out", str(out)],
-                           env=env, cwd=code)
-        if r.returncode != 0:
-            print(f"!!! job failed: {job['config']} seed {seed} (exit {r.returncode}); continuing", flush=True)
+        try:
+            r = subprocess.run([sys.executable, "-u", "-m", "landslide.run", "--config", str(code / job["config"]), "--seed", str(seed),
+                                "--out", str(out)], env=env, cwd=code, timeout=job.get("timeout_s", 1800))
+            if r.returncode != 0:
+                print(f"!!! job failed: {job['config']} seed {seed} (exit {r.returncode}); continuing", flush=True)
+        except subprocess.TimeoutExpired:
+            print(f"!!! job TIMED OUT: {job['config']} seed {seed}", flush=True)
 shutil.make_archive(str(WORK / "results"), "zip", WORK / "results")
 print("done; total seconds", time.time() - t0)
