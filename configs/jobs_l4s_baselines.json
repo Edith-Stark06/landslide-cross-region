@@ -1,0 +1,5 @@
+[
+  {"config": "configs/baseline_l4s_unet.yaml", "seeds": [0], "timeout_s": 3000},
+  {"config": "configs/baseline_l4s_deeplabv3plus.yaml", "seeds": [0], "timeout_s": 3000},
+  {"config": "configs/baseline_l4s_segformer_b0.yaml", "seeds": [0], "timeout_s": 3000}
+]
