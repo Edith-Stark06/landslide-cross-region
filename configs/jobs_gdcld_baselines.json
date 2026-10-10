@@ -1,0 +1,5 @@
+[
+  {"config": "configs/baseline_gdcld_unet.yaml", "seeds": [0], "timeout_s": 4500},
+  {"config": "configs/baseline_gdcld_deeplabv3plus.yaml", "seeds": [0], "timeout_s": 4500},
+  {"config": "configs/baseline_gdcld_segformer_b0.yaml", "seeds": [0], "timeout_s": 4500}
+]
