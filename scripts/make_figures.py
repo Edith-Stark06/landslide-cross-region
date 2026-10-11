@@ -19,24 +19,28 @@ FIG = ROOT / "figures"
 FIG.mkdir(exist_ok=True)
 RUNS = ROOT / "results" / "runs"
 DS = ["l4s", "hrgldd", "gdcld", "lmhld", "cas"]
+NAMES = {"l4s": "L4S", "hrgldd": "HR-GLDD", "gdcld": "GDCLD", "lmhld": "LMHLD", "cas": "CAS"}
 
 
-def load(name, fold):
-    for d in (f"{name}__{fold}__seed0", f"{name}__{fold}__{fold}__seed0"):     # adapter configs carry the fold in their name too
-        f = RUNS / d / "result.json"
-        if f.exists():
-            return json.loads(f.read_text())
-    return None
+def load_all(name, fold):
+    """All seeds of one (method, fold) as {seed: result}. Adapter configs carry the fold in their name too, so both layouts are tried."""
+    out = {}
+    for pat in (f"{name}__{fold}__seed*", f"{name}__{fold}__{fold}__seed*"):
+        for d in RUNS.glob(pat):
+            if (d / "result.json").exists():
+                r = json.loads((d / "result.json").read_text())
+                out[r["seed"]] = r
+    return out
 
 
 def strict_mean(name_for):
-    vals = []
-    for d in DS:
-        r = load(*name_for(d))
-        if r is None:
-            return None
-        vals.append(100 * r["test"][d]["iou_landslide"])
-    return float(np.mean(vals)), vals
+    """(mean over seeds of the 5-dataset mean IoU, std over seeds, n seeds with all 5 folds, per-dataset seed means) or None."""
+    per_ds = {d: load_all(*name_for(d)) for d in DS}
+    seeds = set.intersection(*[set(v) for v in per_ds.values()]) if all(per_ds.values()) else set()
+    if not seeds:
+        return None
+    per_seed = [np.mean([100 * per_ds[d][s]["test"][d]["iou_landslide"] for d in DS]) for s in sorted(seeds)]
+    return float(np.mean(per_seed)), (float(np.std(per_seed, ddof=1)) if len(per_seed) > 1 else 0.0), len(per_seed)
 
 
 # ---------------------------------------------------------------- Pareto
@@ -57,34 +61,41 @@ for label, fn in cands:
     if s is None:
         continue
     ms, pm = latency("SegFormer-B0 + band adapter" if "adapter" in label else "SegFormer-B0" if "SegFormer-B0" in label else label)
-    ax.scatter(ms, s[0], s=40 + 8 * pm, label=f"{label} ({pm:.1f} M)")
-    ax.annotate(f"{s[0]:.1f}", (ms, s[0]), textcoords="offset points", xytext=(6, 4), fontsize=8)
+    ax.errorbar(ms, s[0], yerr=s[1], fmt="none", ecolor="gray", capsize=3, lw=1)
+    ax.scatter(ms, s[0], s=40 + 8 * pm, label=f"{label} ({pm:.1f} M, n={s[2]} seeds)", zorder=3)
+    ax.annotate(f"{s[0]:.1f}", (ms, s[0]), textcoords="offset points", xytext=(8, 4), fontsize=8)
 ax.set_xlabel("CPU latency, 128 px, 4 threads (ms, median; i5-1135G7)")
 ax.set_ylabel("Mean B-strict landslide IoU over 5 held-out datasets")
-ax.set_title("Accuracy vs. latency (single seed)", fontsize=10)
+ax.set_title("Accuracy vs. latency (mean ± std over seeds where n>1)", fontsize=9)
 ax.legend(fontsize=7, loc="best")
 ax.grid(alpha=0.3)
 fig.tight_layout(); fig.savefig(FIG / "fig_pareto.png", dpi=200); plt.close(fig)
 print("wrote fig_pareto.png")
 
 # ---------------------------------------------------------------- reliability
-rel = []
-for f in sorted(RUNS.glob("*/result.json")):
-    r = json.loads(f.read_text())
-    for ds, m in r["test"].items():
-        if "reliability" in m:
-            rel.append((r["run_id"], ds, m["reliability"], m["ece"]))
-if rel:
-    n = min(len(rel), 6)
-    fig, axes = plt.subplots(1, n, figsize=(2.6 * n, 2.8), squeeze=False)
-    for ax, (rid, ds, rb, ece) in zip(axes[0], rel[:n]):
-        pts = [(c, a) for c, a in zip(rb["confidence"], rb["accuracy"]) if c is not None]
-        ax.plot([0.5, 1], [0.5, 1], "k--", lw=0.8)
-        ax.plot(*zip(*pts), "o-", ms=3)
-        ax.set_title(f"{rid.split('__')[0][:22]}\n{ds}, ECE {ece:.3f}", fontsize=6)
-        ax.set_xlabel("confidence", fontsize=7); ax.set_ylabel("accuracy", fontsize=7)
+REL_METHODS = [("U-Net R34", "xd_Bstrict_unet", "xd_Bstrict_fixbgr_unet"), ("SegFormer-B0 (RGB)", "xd_Bstrict_segformer_b0", "xd_Bstrict_fixbgr_segformer_b0"),
+               ("SegFormer-B0 + adapter", "xd_Bstrict_adapter_segformer_b0", "xd_Bstrict_adapter_segformer_b0")]
+panels = {}
+for label, nm, nm_hr in REL_METHODS:
+    for d in DS:
+        runs_ = load_all(nm_hr if d == "hrgldd" else nm, f"holdout_{d}")
+        for seed, r in runs_.items():
+            if "reliability" in r["test"][d]:
+                panels.setdefault(d, {}).setdefault(label, []).append((seed, r["test"][d]["reliability"], r["test"][d]["ece"]))
+if panels:
+    fig, axes = plt.subplots(1, len(DS), figsize=(3.0 * len(DS), 3.1), squeeze=False)
+    for ax, d in zip(axes[0], DS):
+        ax.plot([0.5, 1], [0.5, 1], "k--", lw=0.8, label="perfect")
+        for label, items in panels.get(d, {}).items():
+            seed, rb, ece = sorted(items, key=lambda t: t[0])[0]                      # lowest seed that stored bins (seed 1)
+            pts = [(c, a) for c, a in zip(rb["confidence"], rb["accuracy"]) if c is not None]
+            ax.plot(*zip(*pts), "o-", ms=2.5, lw=1, label=f"{label} (ECE {ece:.3f})")
+        ax.set_title(f"held-out: {NAMES.get(d, d)}", fontsize=8)
+        ax.set_xlabel("confidence (winning class)", fontsize=7); ax.set_ylabel("accuracy", fontsize=7)
+        ax.legend(fontsize=5, loc="upper left")
+    fig.suptitle("Reliability under B-strict (one seed per curve; pixels in 15 confidence bins)", fontsize=8)
     fig.tight_layout(); fig.savefig(FIG / "fig_reliability.png", dpi=200); plt.close(fig)
-    print("wrote fig_reliability.png from", len(rel), "evaluations")
+    print("wrote fig_reliability.png for", sorted(panels))
 else:
     print("no reliability data yet: fig_reliability.png skipped")
 

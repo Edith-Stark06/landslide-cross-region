@@ -43,6 +43,9 @@ Updated running total after xd-fixbgr and xd-sized: **6.9 h** measured (+ hung s
 
 
 Updated running total after xd-adapter and kd-a/kd-b: **~11.1 h** measured (+ hung smoke <= 6 h). Remaining of 30 h: ~18.9 h (12.9 h worst case).
-| 2026-10-11 | seeds-a (SegFormer-B0 RGB + U-Net, B-strict, seeds 1,2, 5 folds: 20 runs) | 20 | LAUNCHED. Estimate ~2.5 h (2 x 0.5 h + 2 x 0.75 h measured); cap 2,400 s per run | pending |
-| 2026-10-11 | seeds-b (adapter seeds 1,2 on 5 folds + distilled student seed 1 on l4s and cas) | 12 | LAUNCHED. Estimate ~2.7 h (2 x 0.8 h + ~1.1 h measured); cap 2,400 s per adapter run, 4,200 s per KD run | pending |
+| 2026-10-11 | seeds-a (SegFormer-B0 RGB + U-Net, B-strict, seeds 1,2, 5 folds: 20 runs) | 20 | 9,686 s job time + ~1 min start-up = ~2.7 h (estimate 2.5 h); 20/20 runs completed | see running total |
+| 2026-10-11 | seeds-b (adapter seeds 1,2 on 5 folds + distilled student seed 1 on l4s and cas) | 12 | 9,888 s job time + ~1 min start-up = ~2.8 h (estimate 2.7 h); 12/12 runs completed | see running total |
+
+
+Running total after seeds-a (2.7 h) and seeds-b (2.8 h): **~16.6 h** measured (+ hung smoke <= 6 h). Remaining of 30 h: ~13.4 h (7.4 h worst case). All 32 seed runs completed; none timed out.
 
