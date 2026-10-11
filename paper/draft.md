@@ -113,7 +113,7 @@ datasets whose tiles carry no event label (L4S, HR-GLDD, GDCLD train/val) the wh
 overlaps. B-strict therefore uses much less training data (5.5k to 25.0k tiles instead of 30.8k to 47.4k).
 
 **C (leave-one-event/region-out).** Only where every tile has a known group: LMHLD (7 events) and CAS (10 regions). Validation is
-one other whole group. *[PENDING: protocol C runs.]*
+one other whole group. Protocol C splits were built and leakage-checked but **not run** (GPU budget; see §6).
 
 A leakage report checks, for every fold, overlapping tile references, groups straddling train and test, byte-identical tiles across
 train and test, and documented events shared between train and test (all zero for B, B-strict and C; protocol A has one byte-identical
