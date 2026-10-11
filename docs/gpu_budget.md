@@ -21,7 +21,10 @@ Rule: no kernel is launched without writing its estimated hours here first; the 
 
 | 2026-10-11 | gdcld-e60 (SegFormer-B0, 60 ep, 1 seed; under-training check) | 1 | 4,157 s job time (4,131 s train) + ~1 min start-up = ~1.17 h (estimate 1.3 h) | ~3.3 h + the hung smoke (<= 6 h) |
 
-| 2026-10-11 | xd-segformer (SegFormer-B0, protocol B-strict then B, 5 folds each, 10 ep, 128 px crops, 1 seed) | 10 | LAUNCHED. Estimate ~1.9 h (from measured ~11 Mpx/s training); per-fold cap 2,400 s | pending |
-| 2026-10-11 | xd-unet (U-Net, protocol B-strict, 5 folds, 10 ep) | 5 | 2,635 s job time + ~1 min start-up = ~0.75 h (estimate 0.9 h); folds took 245-669 s of training | ~7.1 h so far incl. the segformer kernel still running |
+| 2026-10-11 | xd-segformer (SegFormer-B0, protocol B-strict then B, 5 folds each, 10 ep, 128 px crops, 1 seed) | 10 | 6,320 s job time + ~1 min start-up = ~1.78 h (estimate 1.9 h); B-strict 5 folds 1,806 s + B 5 folds 4,514 s | 5.9 h |
+| 2026-10-11 | xd-unet (U-Net, protocol B-strict, 5 folds, 10 ep) | 5 | 2,635 s job time + ~1 min start-up = ~0.75 h (estimate 0.9 h); folds took 245-669 s of training | (see running total below) |
 | 2026-10-11 | xd kernels, failed launches (dataset list passed as one string; 3 pushes) | - | ~0.05 h each, ~0.1 h total, jobs failed within seconds | +0.1 h |
+
+
+Running total of measured kernel time this week (2026-10-11): smoke 0.05 + l4s 0.45 + gdcld 1.55 + gdcld-e60 1.17 + failed launches 0.1 + xd-unet 0.75 + xd-segformer 1.78 = **5.85 h**, plus the hung first smoke kernel (unknown, <= 6 h). Remaining of 30 h: 24.1 h, or 18.1 h if the hung kernel is counted in full. Check Kaggle's own quota page for the true figure.
 
