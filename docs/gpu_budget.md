@@ -34,3 +34,5 @@ Running total of measured kernel time this week (2026-10-11): smoke 0.05 + l4s 0
 
 Updated running total after xd-fixbgr and xd-sized: **6.9 h** measured (+ hung smoke <= 6 h). Remaining of 30 h: 23.1 h (17.1 h worst case).
 
+| 2026-10-11 | xd-adapter (SegFormer-B0 + band adapter, B-strict, 5 folds, 10 ep) | 5 | LAUNCHED. Estimate ~0.7 h (RGB SegFormer B-strict took 0.6 h; +11-channel loading); cap 2,400 s per job | pending |
+| 2026-10-11 | l4s-refs (in-dataset L4S: RGB SegFormer-B0, RGB U-Net, SegFormer-B0 + adapter; 50 ep) | 3 | LAUNCHED. Estimate ~0.45 h (3 x ~460-575 s measured); cap 1,800 s per job | pending |

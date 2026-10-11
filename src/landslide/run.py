@@ -41,6 +41,10 @@ def build_model(cfg: dict, in_ch: int):
     import segmentation_models_pytorch as smp
     w = "imagenet" if cfg.get("pretrained", True) else None
     kind = cfg["model"]
+    if kind.startswith("adapter_"):          # band adapter in front of a pretrained 3-channel network (mode: bank)
+        from .adapter import AdaptedSegmenter
+        inner = dict(cfg, model=kind.removeprefix("adapter_"))
+        return AdaptedSegmenter(build_model(inner, 3), n_bank=in_ch)
     if kind == "unet":
         return smp.Unet(cfg.get("encoder", "resnet34"), encoder_weights=w, in_channels=in_ch, classes=2)
     if kind == "deeplabv3plus":
@@ -81,7 +85,7 @@ def evaluate(model, refs, cfg, device, batch_size=16, workers=2):
             for b in DataLoader(ds, batch_size=batch_size, shuffle=False, num_workers=workers):
                 x = b["image"].to(device)
                 with torch.autocast(device_type=device.type, enabled=device.type == "cuda"):
-                    logits = model(x)
+                    logits = model(x, b["avail"].to(device)) if getattr(model, "needs_avail", False) else model(x)
                 p = torch.softmax(logits.float(), 1)[:, 1].cpu().numpy()
                 t = b["mask"].numpy()
                 meter.update(p, t)
@@ -146,7 +150,7 @@ def main(argv=None) -> dict:
         for b in loader:
             x, y = b["image"].to(device, non_blocking=True), b["mask"].to(device, non_blocking=True)
             with torch.autocast(device_type=device.type, enabled=device.type == "cuda"):
-                logits = model(x)
+                logits = model(x, b["avail"].to(device)) if getattr(model, "needs_avail", False) else model(x)
             loss = loss_fn(logits.float(), y)
             opt.zero_grad(set_to_none=True)
             scaler.scale(loss).backward(); scaler.step(opt); scaler.update()
@@ -168,7 +172,7 @@ def main(argv=None) -> dict:
     h = int(cfg.get("crop") or train_ds[0]["image"].shape[1])
     model.eval()
     with FlopCounterMode(display=False) as fc, torch.no_grad():
-        model(torch.zeros(1, in_ch, h, h, device=device))
+        model(torch.zeros(1, in_ch, h, h, device=device))     # avail defaults to all-ones in the adapter wrapper
     result = dict(config=cfg, seed=seed, run_id=run_id, code_revision=code_revision(), torch=torch.__version__,
                   device=torch.cuda.get_device_name(0) if device.type == "cuda" else "cpu", n_params=n_params,
                   gflops_at_input=fc.get_total_flops() / 2e9, input_hw=h, n_train=len(train), n_val=len(val), n_test=n_test,

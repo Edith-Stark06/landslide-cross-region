@@ -1,0 +1,14 @@
+name: xd_Bstrict_adapter_segformer_b0__holdout_lmhld
+protocol: protocol_B_strict
+fold: holdout_lmhld
+model: adapter_segformer_b0
+mode: bank
+pretrained: true
+epochs: 10
+batch_size: 32
+lr: 0.0002
+weight_decay: 0.01
+crop: 128
+max_val: 3000
+num_workers: 3
+seed: 0

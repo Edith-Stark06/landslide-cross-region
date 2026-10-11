@@ -1,0 +1,23 @@
+[
+ {
+  "config": "configs/inds_l4s_rgb_segformer_b0.yaml",
+  "seeds": [
+   0
+  ],
+  "timeout_s": 1800
+ },
+ {
+  "config": "configs/inds_l4s_rgb_unet.yaml",
+  "seeds": [
+   0
+  ],
+  "timeout_s": 1800
+ },
+ {
+  "config": "configs/inds_l4s_bank_adapter_segformer_b0.yaml",
+  "seeds": [
+   0
+  ],
+  "timeout_s": 1800
+ }
+]
