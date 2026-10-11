@@ -161,7 +161,8 @@ student minimises (1 - a) (CE + Dice) + a T^2 KL(teacher_T || student_T) with a 
 
 **Reproducibility.** Code, configs, splits, leakage report and every run's `result.json` (config, seed, git revision, library versions,
 per-epoch history, test metrics including per-event breakdowns) are in the project repository. All reported training used a single
-Kaggle Tesla T4 per job. Weekly GPU time was capped at 30 h; the log is in `docs/gpu_budget.md`.
+Kaggle Tesla T4 per job. Weekly GPU time was capped at 30 h; the log is in `docs/gpu_budget.md`. The `segmentation-models-pytorch` version used on Kaggle was
+not recorded (the package was installed fresh in each kernel); torch versions are stored in every result file.
 
 ## 5 Experiments
 
@@ -240,8 +241,9 @@ SegFormer-B0 22 ms (3.7 M parameters, 0.42 GFLOPs), SegFormer-B0 with the adapte
 (`results/tables/latency_cpu.md`). SegFormer-B0 is both faster and, in the three-seed B-strict experiments, more accurate than the U-Net on average
 (Figure 1: 24.4 ± 2.9 against 17.5 ± 2.9 mean landslide IoU at 22 against 45 ms). The adapter and distilled student sit at the same latency as
 SegFormer-B0 with no accuracy gain. These are laptop-CPU figures, not measurements on a Jetson or other edge device. Pixel-level ECE is low for in-dataset
-runs (0.004 to 0.011) and higher on unseen datasets (Figure 3; §5.2). **Figures:** Figure 1 `figures/fig_pareto.png`; Figure 3 `figures/fig_reliability.png`;
-Figure 4 `figures/fig_failures.png`. Figure 2 (data overview) is not produced yet.
+runs (0.004 to 0.011) and higher on unseen datasets (Figure 3; §5.2). **Figures:** Figure 1 `figures/fig_pareto.png`; Figure 2 `figures/fig_data_overview.png` (24 documented events, 10 of them in at
+least two of the five datasets and 5 in at least three, with Hokkaido 2018 in all five; event membership partly inferred, see §3.2);
+Figure 3 `figures/fig_reliability.png`; Figure 4 `figures/fig_failures.png`.
 
 ## 6 Limitations
 

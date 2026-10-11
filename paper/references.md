@@ -1,8 +1,8 @@
-# References and verification status
+﻿# References and verification status
 
 Status key: **[R]** read the relevant parts of the source itself; **[A]** read the abstract / landing page only; **[S]** seen only as a search-result
 snippet; **[V]** bibliographic details written from memory, NOT checked against any source in this project: verify before submission.
-Nothing here has been checked for correct page numbers beyond what is stated.
+Rows 5, 14, 16-19 and 21-23 were re-checked against search results on 2026-10-12 (see their status cells); everything else keeps the status it had. Nothing is checked for page numbers beyond what is stated.
 
 | # | Reference | Status | Notes |
 |---|---|---|---|
@@ -10,7 +10,7 @@ Nothing here has been checked for correct page numbers beyond what is stated.
 | 2 | Ghorbanzadeh O et al. Landslide4Sense: Reference Benchmark Data and Deep Learning Models for Landslide Detection. arXiv:2206.00515 (2022); data Zenodo 10.5281/zenodo.10463239 | A (via dataset README / Zenodo record) | Paper not opened. |
 | 3 | Fang C, Fan X, Wang X, Nava L, Zhong H, Dong X, Qi J, Catani F. A globally distributed dataset of coseismic landslide mapping via multi-source high-resolution remote sensing images. Earth Syst Sci Data 16, 4817-4842 (2024). doi:10.5194/essd-16-4817-2024 | R (dataset section) | The 85.06% mIoU figure in our planning notes was not found/read in this paper. |
 | 4 | Xu Y, Ouyang C, Xu Q, Wang D, Zhao B, Luo Y. CAS landslide dataset: a large-scale and multisensor dataset for deep learning-based landslide detection. Sci Data 11, 12 (2024). doi:10.1038/s41597-023-02847-z | A (Zenodo record, PLoS reference list; Nature page blocked) | |
-| 5 | HR-GLDD: A globally distributed high resolution landslide dataset. Earth Syst Sci Data 15, 3283 (2023). Zenodo 10.5281/zenodo.7189381 | R (text), authors **not captured** | Author list UNVERIFIED. |
+| 5 | Meena SR, Nava L, Bhuyan K, Puliero S, Soares LP, Dias HC, Floris M, Catani F. HR-GLDD: a globally distributed dataset using generalized deep learning (DL) for rapid landslide mapping on high-resolution (HR) satellite imagery. Earth Syst Sci Data 15(7), 3283-3298 (2023). doi:10.5194/essd-15-3283-2023; data Zenodo 10.5281/zenodo.7189381 | R (text) + S (authors, pages, DOI from a 2026-10-12 search) | Authors/pages confirmed by search-result snippets (ESSD page listing), not by opening the PDF. |
 | 6 | Liu G, Wang Y, Chen X, Du B, Li P, Wu Y, Fang Z. LMHLD: A large-scale multi-source high-resolution landslide dataset for landslide detection based on deep learning. arXiv:2502.19866 (2025); data Zenodo 10.5281/zenodo.17258777 | R (paper text via PDF) | The DOI cited in the arXiv abstract resolves to a differently titled record (GSR2SD); LMHLD is a later version. |
 | 7 | Höhn P, Heidler K, Behling R, Zhu XX. A spatio-temporal dataset for satellite-based landslide detection (Sen12Landslides). Sci Data 12, 1772 (2025). doi:10.1038/s41597-025-06167-2 | R (PMC article) | Dataset not used (159 GB). |
 | 8 | Liu Z, Kwan M-P, Wu J, Li H. GeoPhysAdapter: scale-matched geophysical adaptation for cross-domain landslide mapping with vision foundation models. arXiv:2608.09325 (2026) | A | |
@@ -19,15 +19,16 @@ Nothing here has been checked for correct page numbers beyond what is stated.
 | 11 | Szwarcman D et al. Prithvi-EO-2.0: a versatile multi-temporal foundation model for earth observation applications. arXiv:2412.02732 (v3 2026) | R (landslide task, Tables VII-VIII) | |
 | 12 | Vu HB. Clay-CNN hybrids: leveraging geospatial foundation models as auxiliary context for landslide detection. arXiv:2606.14081 (2026) | A | |
 | 13 | Chen W, Chen Z, Song D, He H, Li H, Zhu Y. Landslide detection using the unsupervised domain-adaptive image segmentation method. Land 13(7), 928 (2024). doi:10.3390/land13070928 | S | |
-| 14 | DIGSFNet (cross-modal teacher-student distillation + INT8 for landslide extraction). Remote Sens. 18(16), 2692 (2026). doi:10.3390/rs18162692 | S | Authors not captured; read before claiming novelty. |
+| 14 | DIGSFNet: Deformation-Integrity-Guided Symmetric Fusion Network for High-Risk Landslide Extraction from Multi-Source Remote Sensing Images. Remote Sens. 18(16), 2692 (2026). doi:10.3390/rs18162692 | S (title, journal, reported results; **authors not captured**) | InSAR deformation + optical fusion; reports mIoU 83.57 (Nanning-HHLS) and 78.92 (HAEFNet); the teacher-student/INT8 claim in the draft comes from an earlier snippet and was not re-checked. Read before claiming novelty. |
 | 15 | Lu W, Hu Y, Shao W, Wang H, Zhang Z, Wang M. A multiscale feature fusion enhanced CNN with the multiscale channel attention mechanism for efficient landslide detection (MS2LandsNet) using medium-resolution remote sensing data. Int J Digital Earth 17(1) (2024). doi:10.1080/17538947.2023.2300731 | A (PLoS reference list) | |
-| 16 | Jiang, Ma, Mei. Review: deep learning for potential landslide identification. Nat Hazards Earth Syst Sci 26, 487 (2026) | S (from the planning report; never opened) | Not cited in the draft yet. |
-| 17 | Xie E et al. SegFormer: simple and efficient design for semantic segmentation with transformers. NeurIPS 2021 | **V** | Verify. |
-| 18 | Ronneberger O, Fischer P, Brox T. U-Net: convolutional networks for biomedical image segmentation. MICCAI 2015 | **V** | Verify. |
-| 19 | Chen L-C, Zhu Y, Papandreou G, Schroff F, Adam H. Encoder-decoder with atrous separable convolution for semantic image segmentation (DeepLabV3+). ECCV 2018 | **V** | Verify. |
+| 16 | Jiang P, Ma Z, Mei G. Review article: deep learning for potential landslide identification: data, models, applications, challenges, and opportunities. Nat Hazards Earth Syst Sci 26, 487-529 (2026). doi:10.5194/nhess-26-487-2026 | A/S (authors, pages, DOI, scope from a 2026-10-12 search of the NHESS page and preprints; full text not read) | Not cited in the draft yet. |
+| 17 | Xie E, Wang W, Yu Z, Anandkumar A, Alvarez JM, Luo P. SegFormer: simple and efficient design for semantic segmentation with transformers. arXiv:2105.15203 (2021); NeurIPS 2021 | S: authors and arXiv id confirmed by search; **the NeurIPS 2021 venue was not confirmed** by the snippets | Cite as arXiv until the venue is checked. |
+| 18 | Ronneberger O, Fischer P, Brox T. U-Net: convolutional networks for biomedical image segmentation. arXiv:1505.04597 (2015); MICCAI 2015 | S: authors and arXiv id confirmed; **MICCAI venue not confirmed** by the snippets | Cite as arXiv until the venue (and page range) is checked. |
+| 19 | Chen L-C, Zhu Y, Papandreou G, Schroff F, Adam H. Encoder-decoder with atrous separable convolution for semantic image segmentation. ECCV 2018, pp. 801-818; arXiv:1802.02611; doi:10.1007/978-3-030-01234-2_49 | S: confirmed by search (CVF open access, arXiv, DOI) | |
 | 20 | CAS Landslide Dataset README (Zenodo 10.5281/zenodo.10294997), including the per-region sensor and licence table | R | |
-| 21 | Hu EJ et al. LoRA: low-rank adaptation of large language models. ICLR 2022 | **V** | Verify. |
-| 22 | Hinton G, Vinyals O, Dean J. Distilling the knowledge in a neural network. arXiv:1503.02531 (2015) | **V** | Verify. |
-| 23 | Guo C, Pleiss G, Sun Y, Weinberger KQ. On calibration of modern neural networks. ICML 2017 | **V** | Not yet cited in the text; for the ECE definition. |
+| 21 | Hu EJ, Shen Y, Wallis P, et al. LoRA: low-rank adaptation of large language models. arXiv:2106.09685 (2021); ICLR 2022 | S: first authors and arXiv id confirmed; ICLR 2022 listing found on mlanthology; the full author list differs between arXiv versions in the snippet, so **copy it from the final PDF** | |
+| 22 | Hinton G, Vinyals O, Dean J. Distilling the knowledge in a neural network. arXiv:1503.02531 (2015) | S: confirmed on arXiv/Google Research pages (the snippet places it at the 2015 NIPS Deep Learning workshop; check before citing a venue) | |
+| 23 | Guo C, Pleiss G, Sun Y, Weinberger KQ. On calibration of modern neural networks. Proc. ICML (PMLR 70), 1321-1330 (2017); arXiv:1706.04599 | S: confirmed (PMLR page and arXiv) | Not yet cited in the text; for the ECE definition. |
 | 24 | Iakubovskii P. Segmentation Models PyTorch (software) | **V** | Verify version used (installed fresh on each Kaggle run; record the version in result files: TODO). |
 | 25 | TerraFM; TerraMind; SatMAE; SwinV2; AdaLoRA; LandsDANet; WILD-SAM; Burange et al. 2025; Ge et al. 2023 | not cited | Listed in the planning report; not opened. |
+
