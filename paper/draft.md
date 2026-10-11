@@ -31,7 +31,7 @@ imagery, frequently with random train/test splits. For example, the study that m
 datasets separately with random 70/15/15 or 70/30 splits [1]. Such protocols cannot tell whether a model has learned landslides or the
 appearance of one event, sensor and region, and neighbouring tiles from one event are strongly correlated. Recent work has begun to
 evaluate on unseen events and regions [8, 9], but there is still no common event-isolated protocol over several public datasets, and
-published numbers for the same model on the same dataset differ by several points between papers (§5.1).
+re-running models under our settings gives numbers that differ from published ones for reasons that cannot be separated without identical protocols (§5.1).
 
 We make the following contributions, each supported by experiments reported below.
 
@@ -111,8 +111,8 @@ overlaps. B-strict therefore uses much less training data (5.5k to 25.0k tiles i
 one other whole group. *[PENDING: protocol C runs.]*
 
 A leakage report checks, for every fold, overlapping tile references, groups straddling train and test, byte-identical tiles across
-train and test, and documented events shared between train and test (all zero for B and B-strict apart from one near-black nodata
-GDCLD crop; `splits/leakage_report.csv`). Hashing cannot detect overlapping neighbouring tiles; this is controlled only by splitting
+train and test, and documented events shared between train and test (all zero for B, B-strict and C; protocol A has one byte-identical
+near-black nodata GDCLD crop; `splits/leakage_report.csv`). Hashing cannot detect overlapping neighbouring tiles; this is controlled only by splitting
 at event or region level.
 
 ### 3.3 Data issues found

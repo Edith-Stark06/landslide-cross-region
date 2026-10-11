@@ -1,0 +1,16 @@
+[
+ {
+  "config": "configs/xd_Bstrict_kd_segformer_b0__holdout_l4s.yaml",
+  "seeds": [
+   0
+  ],
+  "timeout_s": 4200
+ },
+ {
+  "config": "configs/xd_Bstrict_kd_segformer_b0__holdout_hrgldd.yaml",
+  "seeds": [
+   0
+  ],
+  "timeout_s": 4200
+ }
+]
