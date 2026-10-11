@@ -1,0 +1,16 @@
+name: xd_Bsized_segformer_b0
+protocol: protocol_B
+fold: holdout_lmhld
+model: segformer_b0
+encoder: resnet34
+mode: rgb
+pretrained: true
+epochs: 10
+batch_size: 32
+crop: 128
+max_val: 3000
+num_workers: 3
+seed: 0
+lr: 0.0002
+weight_decay: 0.01
+max_train: 5526

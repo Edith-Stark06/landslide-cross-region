@@ -1,0 +1,16 @@
+[
+ {
+  "config": "configs/xd_Bstrict_fixbgr_segformer_b0__holdout_hrgldd.yaml",
+  "seeds": [
+   0
+  ],
+  "timeout_s": 2400
+ },
+ {
+  "config": "configs/xd_Bstrict_fixbgr_unet__holdout_hrgldd.yaml",
+  "seeds": [
+   0
+  ],
+  "timeout_s": 2400
+ }
+]
