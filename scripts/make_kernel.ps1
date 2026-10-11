@@ -1,10 +1,10 @@
 # Create (and optionally push) a private GPU kernel that runs jobs.json from the landslide-xr-code dataset.
 # Usage: powershell -File scripts/make_kernel.ps1 -Name landslide-xr-smoke -Datasets l4s [-Push]
-param([Parameter(Mandatory=$true)][string]$Name, [Parameter(Mandatory=$true)][string[]]$Datasets, [switch]$Push)
+param([Parameter(Mandatory=$true)][string]$Name, [Parameter(Mandatory=$true)][string[]]$Datasets, [string]$JobsName = "jobs.json", [switch]$Push)
 $root = Split-Path -Parent $PSScriptRoot
 $dir = Join-Path $root ".cache\kernels\$Name"
 New-Item -ItemType Directory -Force -Path $dir | Out-Null
-Copy-Item (Join-Path $root "scripts\kaggle_entry.py") (Join-Path $dir "entry.py") -Force
+(Get-Content (Join-Path $root "scripts\kaggle_entry.py") -Raw) -replace 'JOBS_FILE = "jobs.json"', "JOBS_FILE = `"$JobsName`"" | Set-Content (Join-Path $dir "entry.py") -Encoding utf8
 $sources = @("edithstark/landslide-xr-code") + ($Datasets | ForEach-Object { "edithstark/landslide-xr-$_" })
 $meta = [ordered]@{ id="edithstark/$Name"; title=$Name; code_file="entry.py"; language="python"; kernel_type="script";
   is_private=$true; enable_gpu=$true; enable_internet=$true; dataset_sources=$sources; competition_sources=@(); kernel_sources=@() }

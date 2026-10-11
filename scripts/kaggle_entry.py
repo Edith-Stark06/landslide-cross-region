@@ -38,7 +38,8 @@ code = WORK / "code"
 if code.exists():
     shutil.rmtree(code)
 shutil.copytree(find_dataset("landslide-xr-code"), code)
-jobs = json.loads((code / "jobs.json").read_text())
+JOBS_FILE = "jobs.json"   # make_kernel.ps1 -JobsName rewrites this line so several kernels can share one code dataset
+jobs = json.loads((code / JOBS_FILE).read_text())
 
 proc = WORK / "processed"
 proc.mkdir(exist_ok=True)

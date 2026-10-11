@@ -112,7 +112,11 @@ def main(argv=None) -> dict:
     splits = json.loads((ROOT / "splits" / f"{cfg['protocol']}.json").read_text())[cfg["fold"]]
     rng = np.random.default_rng(seed)
     sub = lambda refs, n: refs if not n or len(refs) <= n else [refs[i] for i in sorted(rng.choice(len(refs), n, replace=False))]  # noqa: E731
-    train, val, test = (sub(splits["train"], cfg.get("max_train")), sub(splits["val"], cfg.get("max_eval")), sub(splits["test"], cfg.get("max_eval")))
+    # max_val caps the per-epoch validation set (checkpoint selection only). The test set is never subsampled unless max_test /
+    # max_eval is set explicitly (smoke tests).
+    train = sub(splits["train"], cfg.get("max_train"))
+    val = sub(splits["val"], cfg.get("max_val", cfg.get("max_eval")))
+    test = sub(splits["test"], cfg.get("max_test", cfg.get("max_eval")))
 
     seed_everything(seed)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
