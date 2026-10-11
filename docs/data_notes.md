@@ -22,3 +22,6 @@ Everything here was read from the downloaded, MD5-verified archives unless marke
 - Windows Application Control blocks `h5py`'s DLL (HDF5 is read with pure-Python `pyfive`) and sometimes PyTorch's `shm.dll`. Preprocessing therefore uses only numpy/PIL. Training happens on Kaggle.
 - One GDCLD test crop (`Mesetas.tif#r4c0`) is byte-identical to a train tile; both are near-black nodata (values 1-2, no landslide). Reported in the leakage table; not meaningful leakage.
 - Byte-identical hashing cannot detect overlapping or neighbouring tiles; within-region overlap (CAS, LMHLD) is controlled only by splitting at region/event level.
+
+## HR-GLDD channel order (added 2026-10-11)
+The paper text says R,G,B,NIR, but channel means (0.109 / 0.150 / 0.140 / 0.500) show blue < red < green like the documented-B,G,R,NIR PlanetScope scenes of LMHLD (Hokkaido 336/412/386), not like R,G,B (red below blue). From 2026-10-11 the loader maps HR-GLDD as B,G,R,NIR. This is statistical evidence only and remains UNVERIFIED. Runs made earlier (all U-Net B-strict folds, and the SegFormer B-strict/B kernel running at that time) used the old R,G,B mapping; only folds where HR-GLDD is test or training data are affected (in B-strict that is the holdout_hrgldd fold only, because HR-GLDD shares events with every other dataset and is dropped from training).

@@ -74,7 +74,8 @@ def evaluate(model, refs, cfg, device, batch_size=16, workers=2):
     out = {}
     for name in sorted({r[0] for r in refs}):
         ds = data.LandslideDataset([r for r in refs if r[0] == name], mode=cfg["mode"], augment=False)
-        meter = BinaryMeter()
+        groups = ds._cache[name][2].group.to_numpy()          # event / region id per tile ('unknown' where not exposed)
+        meter, by_group = BinaryMeter(), {}
         model.eval()
         with torch.no_grad():
             for b in DataLoader(ds, batch_size=batch_size, shuffle=False, num_workers=workers):
@@ -82,8 +83,15 @@ def evaluate(model, refs, cfg, device, batch_size=16, workers=2):
                 with torch.autocast(device_type=device.type, enabled=device.type == "cuda"):
                     logits = model(x)
                 p = torch.softmax(logits.float(), 1)[:, 1].cpu().numpy()
-                meter.update(p, b["mask"].numpy())
+                t = b["mask"].numpy()
+                meter.update(p, t)
+                g = groups[b["index"].numpy()]
+                for gname in np.unique(g):
+                    if gname != "unknown":
+                        by_group.setdefault(gname, BinaryMeter()).update(p[g == gname], t[g == gname])
         out[name] = meter.compute()
+        if by_group:                                           # per-event / per-region breakdown (for the paper's failure analysis)
+            out[name]["by_group"] = {k: m.compute() for k, m in by_group.items()}
     return out
 
 
