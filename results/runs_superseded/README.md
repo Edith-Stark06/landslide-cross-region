@@ -1,0 +1,1 @@
+﻿Runs made with the wrong HR-GLDD channel order (R,G,B instead of B,G,R,NIR). Kept for the record, excluded from tables. Replaced by xd_Bstrict_fixbgr_* (2026-10-11). Plain-B runs (results/runs/xd_B_segformer_b0__*) also used the old order for HR-GLDD training tiles (about 3% of each training set; the holdout_hrgldd fold is fully affected) and are flagged in docs/data_notes.md.
