@@ -79,7 +79,9 @@ def forward(model, b, device):
     return model(x, b["avail"].to(device)) if getattr(model, "needs_avail", False) else model(x)
 
 
-def evaluate(model, refs, cfg, device, batch_size=16, workers=2):
+def evaluate(model, refs, cfg, device, batch_size=16, workers=2, examples_dir=None):
+    """Metrics per dataset in refs. With examples_dir (final test evaluation only) also saves reliability-diagram bins in the result and
+    an examples_<dataset>.npz with the 6 worst and 6 best tiles (by tile IoU, among tiles with >=1% landslide pixels) for failure figures."""
     import torch
     from torch.utils.data import DataLoader
 
@@ -89,7 +91,7 @@ def evaluate(model, refs, cfg, device, batch_size=16, workers=2):
     for name in sorted({r[0] for r in refs}):
         ds = data.LandslideDataset([r for r in refs if r[0] == name], mode=cfg["mode"], augment=False)
         groups = ds._cache[name][2].group.to_numpy()          # event / region id per tile ('unknown' where not exposed)
-        meter, by_group = BinaryMeter(), {}
+        meter, by_group, tile_idx, tile_iou, tile_pos = BinaryMeter(), {}, [], [], []
         model.eval()
         with torch.no_grad():
             for b in DataLoader(ds, batch_size=batch_size, shuffle=False, num_workers=workers):
@@ -102,9 +104,28 @@ def evaluate(model, refs, cfg, device, batch_size=16, workers=2):
                 for gname in np.unique(g):
                     if gname != "unknown":
                         by_group.setdefault(gname, BinaryMeter()).update(p[g == gname], t[g == gname])
+                if examples_dir is not None:
+                    pr, tt = p >= 0.5, t == 1
+                    tp, fp, fn = (pr & tt).sum((1, 2)), (pr & ~tt).sum((1, 2)), (~pr & tt).sum((1, 2))
+                    tile_idx += b["index"].numpy().tolist(); tile_iou += (tp / np.maximum(tp + fp + fn, 1)).tolist()
+                    tile_pos += tt.mean((1, 2)).tolist()
         out[name] = meter.compute()
         if by_group:                                           # per-event / per-region breakdown (for the paper's failure analysis)
             out[name]["by_group"] = {k: m.compute() for k, m in by_group.items()}
+        if examples_dir is not None:
+            out[name]["reliability"] = meter.reliability()
+            ok = [i for i, pz in enumerate(tile_pos) if pz >= 0.01]
+            order = sorted(ok, key=lambda i: tile_iou[i])
+            pick = order[:6] + order[-6:] if len(order) >= 12 else order
+            local = {k: j for j, (_, k) in enumerate(ds.refs)}
+            items = [ds[local[tile_idx[i]]] for i in pick]
+            if items:
+                batch = {k: torch.as_tensor(np.stack([it[k] for it in items])) for k in ("image", "mask", "avail")}
+                with torch.no_grad(), torch.autocast(device_type=device.type, enabled=device.type == "cuda"):
+                    prob = torch.softmax(forward(model, batch, device).float(), 1)[:, 1].cpu().numpy()
+                np.savez_compressed(Path(examples_dir) / f"examples_{name}.npz", tile=np.array([tile_idx[i] for i in pick]),
+                                    iou=np.array([tile_iou[i] for i in pick]), image=batch["image"][:, :3].numpy().astype(np.float16),
+                                    mask=batch["mask"].numpy().astype(np.uint8), prob=prob.astype(np.float16))
     return out
 
 
@@ -219,7 +240,7 @@ def main(argv=None) -> dict:
     model = build_model(cfg, in_ch).to(device)
     fit_s = fit(model, train_ds, val, cfg, device, seed, int(cfg.get("epochs", 30)), cfg.get("lr", 3e-4), cfg.get("weight_decay", 1e-4),
                 run_id, teacher=teacher)
-    test = evaluate(model, test_refs, cfg, device)
+    test = evaluate(model, test_refs, cfg, device, examples_dir=out_dir if cfg.get("save_examples") else None)
     prof = profile(model, in_ch, h, device)
     result = dict(config=cfg, seed=seed, run_id=run_id, code_revision=code_revision(), torch=torch.__version__,
                   device=torch.cuda.get_device_name(0) if device.type == "cuda" else "cpu", n_params=prof["n_params"],

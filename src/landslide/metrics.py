@@ -53,3 +53,20 @@ class BinaryMeter:
                 ece += nb / n_tot * abs(correct[sel].sum() / nb - (conf[sel] * n_bin[sel]).sum() / nb)
         out["ece"] = float(ece)
         return {k: (float(v) if isinstance(v, (np.floating, float)) else v) for k, v in out.items()}
+
+    def reliability(self, nbins: int = 15) -> dict:
+        """Reliability-diagram data for the winning class, using the same 15 confidence bins as the ECE. Lists of length nbins:
+        pixel count, mean confidence and accuracy per bin (None where a bin is empty). ECE = sum(count/total * |acc - conf|)."""
+        centres = (np.arange(NBINS) + 0.5) / NBINS
+        conf = np.maximum(centres, 1 - centres)
+        n_bin = self.hist_pos + self.hist_neg
+        correct = np.where(centres >= 0.5, self.hist_pos, self.hist_neg)
+        edges = np.minimum(((conf - 0.5) / 0.5 * nbins).astype(int), nbins - 1)
+        count, acc, mconf = [], [], []
+        for b in range(nbins):
+            sel = edges == b
+            nb = int(n_bin[sel].sum())
+            count.append(nb)
+            acc.append(float(correct[sel].sum() / nb) if nb else None)
+            mconf.append(float((conf[sel] * n_bin[sel]).sum() / nb) if nb else None)
+        return dict(count=count, accuracy=acc, confidence=mconf)

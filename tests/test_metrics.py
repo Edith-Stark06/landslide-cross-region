@@ -34,6 +34,17 @@ def test_overconfident_wrong_predictions_have_high_ece():
     assert r["ece"] > 0.9
 
 
+def test_reliability_bins_reproduce_ece():
+    rng = np.random.default_rng(1)
+    p = rng.uniform(0, 1, 50000)
+    t = (rng.uniform(0, 1, p.size) < np.clip(p * 0.8 + 0.1, 0, 1)).astype(int)     # deliberately miscalibrated
+    m = BinaryMeter(); m.update(p, t)
+    rel = m.reliability()
+    tot = sum(rel["count"])
+    ece = sum(c / tot * abs(a - f) for c, a, f in zip(rel["count"], rel["accuracy"], rel["confidence"]) if c)
+    assert abs(ece - m.compute()["ece"]) < 1e-9 and tot == p.size
+
+
 def test_calibrated_predictions_have_low_ece():
     rng = np.random.default_rng(0)
     p = rng.uniform(0.0, 1.0, 200000)
