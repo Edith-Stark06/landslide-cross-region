@@ -86,6 +86,8 @@ def test_protocol_b_holds_out_whole_dataset():
 def test_protocol_c_holds_out_whole_group(proto):
     import pandas as pd
     name = proto.removeprefix("protocol_C_")
+    if not (data.PROCESSED / name / "meta.csv").exists():
+        pytest.skip(f"processed dataset {name} not found (set LANDSLIDE_PROCESSED)")
     meta = pd.read_csv(data.PROCESSED / name / "meta.csv")
     for fold, s in json.loads((ROOT / "splits" / f"{proto}.json").read_text()).items():
         held = fold.removeprefix("holdout_")
