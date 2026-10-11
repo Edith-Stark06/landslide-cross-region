@@ -1,6 +1,7 @@
 name,test_dataset,mIoU,IoU_landslide,F1,precision,recall,PR_AUC,ECE,mIoU_std,IoU_landslide_std,F1_std,precision_std,recall_std,PR_AUC_std,ECE_std,n_seeds
 baseline_gdcld_deeplabv3plus,gdcld,66.982,34.832,51.667,63.166,43.711,0.562,0.005,,,,,,,,1
 baseline_gdcld_segformer_b0,gdcld,70.096,40.934,58.089,72.566,48.428,0.654,0.004,,,,,,,,1
+baseline_gdcld_segformer_b0_e60,gdcld,69.573,40.001,57.144,61.2,53.591,0.529,0.005,,,,,,,,1
 baseline_gdcld_unet,gdcld,68.959,38.71,55.814,68.541,47.074,0.604,0.005,,,,,,,,1
 baseline_l4s_deeplabv3plus,l4s,71.862,45.271,62.326,58.319,66.925,0.636,0.011,,,,,,,,1
 baseline_l4s_segformer_b0,l4s,72.57,46.705,63.672,57.308,71.626,0.657,0.01,,,,,,,,1
