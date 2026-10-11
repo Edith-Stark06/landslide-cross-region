@@ -1,0 +1,11 @@
+\begin{tabular}{lrrrrrr}
+\toprule
+Model & Params (M) & Weights fp32 (MB) & GFLOPs, 128 px & 128 px, 1 thread (ms) & 128 px, 4 threads (ms) & 256 px, 4 threads (ms) \\
+\midrule
+U-Net R34 & 24.4 & 98 & 1.96 & 92 & 45 & 141 \\
+DeepLabV3+ R34 & 22.4 & 90 & 1.97 & 90 & 53 & 139 \\
+SegFormer-B0 & 3.7 & 15 & 0.42 & 28 & 22 & 78 \\
+SegFormer-B0 + band adapter & 3.7 & 15 & 0.43 & 41 & 23 & 88 \\
+SegFormer-B3 (teacher) & 44.6 & 178 & 2.26 & 176 & 88 & 289 \\
+\bottomrule
+\end{tabular}

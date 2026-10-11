@@ -1,0 +1,10 @@
+\begin{tabular}{lcccccc}
+\toprule
+Method & L4S & HR-GLDD & GDCLD & LMHLD & CAS & Mean \\
+\midrule
+U-Net (ResNet34) & 0.016$\pm$0.009 & 0.058$\pm$0.006 & 0.052$\pm$0.003 & 0.168$\pm$0.008 & 0.142$\pm$0.003 & 0.087$\pm$0.003 \\
+SegFormer-B0 & 0.026$\pm$0.022 & 0.055$\pm$0.002 & 0.044$\pm$0.001 & 0.044$\pm$0.007 & 0.108$\pm$0.005 & 0.055$\pm$0.006 \\
+SegFormer-B0 + band adapter & 0.036$\pm$0.029 & 0.051$\pm$0.003 & 0.041$\pm$0.002 & 0.058$\pm$0.016 & 0.112$\pm$0.002 & 0.060$\pm$0.009 \\
+SegFormer-B0 distilled student & 0.034$\pm$0.019$^\ddagger$ & 0.056$^\dagger$ & 0.041$^\dagger$ & 0.027$^\dagger$ & 0.120$\pm$0.001$^\ddagger$ & 0.053$^\dagger$ \\
+\bottomrule
+\end{tabular}

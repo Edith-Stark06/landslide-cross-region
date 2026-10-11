@@ -1,0 +1,67 @@
+﻿{
+    "provenance":  "Values printed by a script run on the processed data on 2026-10-11 (script saved as scripts/channel_statistics.py; the data drive was disconnected when this file was written, so the values are copied from that run\u0027s console output). Regenerate with the drive attached.",
+    "lmhld":  {
+                  "Taiwan_China":  {
+                                       "means_BGRNIR":  [
+                                                            220.5,
+                                                            403.5,
+                                                            433.4,
+                                                            2219.8
+                                                        ],
+                                       "sensor":  "PlanetScope"
+                                   },
+                  "Hokkaido_Japan":  {
+                                         "means_BGRNIR":  [
+                                                              336.3,
+                                                              412,
+                                                              386.5,
+                                                              2484.5
+                                                          ],
+                                         "sensor":  "PlanetScope"
+                                     },
+                  "Gorkha_Nepal":  {
+                                       "means_BGRNIR":  [
+                                                            861.9,
+                                                            1124,
+                                                            1331.3,
+                                                            2081.1
+                                                        ],
+                                       "sensor":  "Sentinel-2"
+                                   },
+                  "Jiuzhaigou_China":  {
+                                           "means_BGRNIR":  [
+                                                                368.8,
+                                                                589.3,
+                                                                568.1,
+                                                                2386.9
+                                                            ],
+                                           "sensor":  "Gaofen-2"
+                                       },
+                  "Emilia-Romagna_Italy":  {
+                                               "means_BGRNIR":  [
+                                                                    1472.5,
+                                                                    1705,
+                                                                    1627.4,
+                                                                    4111
+                                                                ],
+                                               "sensor":  "Sentinel-2"
+                                           },
+                  "Wenchuan_China":  {
+                                         "means_BGRNIR":  [
+                                                              459.4,
+                                                              1253.3,
+                                                              1063.1,
+                                                              4442.2
+                                                          ],
+                                         "sensor":  "IKONOS"
+                                     }
+              },
+    "hrgldd":  {
+                   "means_array_channels_0_to_3":  [
+                                                       0.1088,
+                                                       0.1503,
+                                                       0.1395,
+                                                       0.4999
+                                                   ]
+               }
+}

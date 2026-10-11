@@ -1,0 +1,37 @@
+[
+ {
+  "config": "configs/xd_Bcomp_segformer_b0__holdout_l4s.yaml",
+  "seeds": [
+   2
+  ],
+  "timeout_s": 2400
+ },
+ {
+  "config": "configs/xd_Bcomp_segformer_b0__holdout_hrgldd.yaml",
+  "seeds": [
+   2
+  ],
+  "timeout_s": 2400
+ },
+ {
+  "config": "configs/xd_Bcomp_segformer_b0__holdout_gdcld.yaml",
+  "seeds": [
+   2
+  ],
+  "timeout_s": 2400
+ },
+ {
+  "config": "configs/xd_Bcomp_segformer_b0__holdout_lmhld.yaml",
+  "seeds": [
+   2
+  ],
+  "timeout_s": 2400
+ },
+ {
+  "config": "configs/xd_Bcomp_segformer_b0__holdout_cas.yaml",
+  "seeds": [
+   2
+  ],
+  "timeout_s": 2400
+ }
+]

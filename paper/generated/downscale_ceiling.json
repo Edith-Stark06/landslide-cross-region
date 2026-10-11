@@ -1,0 +1,7 @@
+﻿{
+    "provenance":  "Output of scripts/downscale_ceiling.py run on 2026-10-10 on the GDCLD test crops (values copied from the console output; the raw archive\u0027s drive was disconnected when this file was written). Perfect 256 px predictor evaluated against full-resolution labels.",
+    "miou":  94.7,
+    "f1":  94.47,
+    "pos_ratio_pct":  1.04,
+    "iou_landslide":  89.52
+}

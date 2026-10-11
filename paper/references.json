@@ -1,0 +1,147 @@
+[
+ {
+  "key": "srivats2026",
+  "status": "read (dataset and reference sections)",
+  "text": "Srivats, R., Johnson, D. R., Logeswari, G., Saimirra, R., Siddiqui, M., Sharma, A. (2026). A multi-modal deep learning framework with GAN-based fusion for enhanced landslide detection. \\emph{PLoS ONE}. doi:10.1371/journal.pone.0347324."
+ },
+ {
+  "key": "jiang2026review",
+  "status": "abstract/search",
+  "text": "Jiang, P., Ma, Z., Mei, G. (2026). Review article: deep learning for potential landslide identification: data, models, applications, challenges, and opportunities. \\emph{Nat. Hazards Earth Syst. Sci.}, 26, 487--529. doi:10.5194/nhess-26-487-2026."
+ },
+ {
+  "key": "ghorbanzadeh2022",
+  "status": "search (authors truncated to 'et al.')",
+  "text": "Ghorbanzadeh, O., et al. (2022). The outcome of the 2022 Landslide4Sense competition: advanced landslide detection from multisource satellite imagery. \\emph{IEEE J. Sel. Topics Appl. Earth Obs. Remote Sens.}, 15, 9927--9942. doi:10.1109/JSTARS.2022.3220845. Data: doi:10.5281/zenodo.10463239."
+ },
+ {
+  "key": "fang2024gdcld",
+  "status": "read (dataset section, results text via retrieval tool)",
+  "text": "Fang, C., Fan, X., Wang, X., Nava, L., Zhong, H., Dong, X., Qi, J., Catani, F. (2024). A globally distributed dataset of coseismic landslide mapping via multi-source high-resolution remote sensing images. \\emph{Earth Syst. Sci. Data}, 16, 4817--4842. doi:10.5194/essd-16-4817-2024."
+ },
+ {
+  "key": "xu2024cas",
+  "status": "record/reference list",
+  "text": "Xu, Y., Ouyang, C., Xu, Q., Wang, D., Zhao, B., Luo, Y. (2024). CAS Landslide Dataset: a large-scale and multisensor dataset for deep learning-based landslide detection. \\emph{Sci. Data}, 11, 12. doi:10.1038/s41597-023-02847-z."
+ },
+ {
+  "key": "meena2023hrgldd",
+  "status": "text read; authors/pages from search",
+  "text": "Meena, S. R., Nava, L., Bhuyan, K., Puliero, S., Soares, L. P., Dias, H. C., Floris, M., Catani, F. (2023). HR-GLDD: a globally distributed dataset using generalized deep learning (DL) for rapid landslide mapping on high-resolution (HR) satellite imagery. \\emph{Earth Syst. Sci. Data}, 15(7), 3283--3298. doi:10.5194/essd-15-3283-2023."
+ },
+ {
+  "key": "liu2025lmhld",
+  "status": "read (PDF text)",
+  "text": "Liu, G., Wang, Y., Chen, X., Du, B., Li, P., Wu, Y., Fang, Z. (2025). LMHLD: a large-scale multi-source high-resolution landslide dataset for landslide detection based on deep learning. arXiv:2502.19866."
+ },
+ {
+  "key": "hohn2025sen12",
+  "status": "read",
+  "text": "H\\\"ohn, P., Heidler, K., Behling, R., Zhu, X. X. (2025). A spatio-temporal dataset for satellite-based landslide detection. \\emph{Sci. Data}, 12, 1772. doi:10.1038/s41597-025-06167-2."
+ },
+ {
+  "key": "xie2021segformer",
+  "status": "search (venue not confirmed; cited as arXiv)",
+  "text": "Xie, E., Wang, W., Yu, Z., Anandkumar, A., Alvarez, J. M., Luo, P. (2021). SegFormer: simple and efficient design for semantic segmentation with transformers. arXiv:2105.15203."
+ },
+ {
+  "key": "ronneberger2015unet",
+  "status": "search (venue not confirmed; cited as arXiv)",
+  "text": "Ronneberger, O., Fischer, P., Brox, T. (2015). U-Net: convolutional networks for biomedical image segmentation. arXiv:1505.04597."
+ },
+ {
+  "key": "chen2018deeplab",
+  "status": "search (CVF/arXiv/DOI)",
+  "text": "Chen, L.-C., Zhu, Y., Papandreou, G., Schroff, F., Adam, H. (2018). Encoder-decoder with atrous separable convolution for semantic image segmentation. In \\emph{Proc. ECCV}, 801--818. doi:10.1007/978-3-030-01234-2\\_49."
+ },
+ {
+  "key": "hu2022lora",
+  "status": "search (author list truncated)",
+  "text": "Hu, E. J., Shen, Y., Wallis, P., et al. (2022). LoRA: low-rank adaptation of large language models. In \\emph{Proc. ICLR}. arXiv:2106.09685."
+ },
+ {
+  "key": "hinton2015distill",
+  "status": "search",
+  "text": "Hinton, G., Vinyals, O., Dean, J. (2015). Distilling the knowledge in a neural network. arXiv:1503.02531."
+ },
+ {
+  "key": "guo2017calib",
+  "status": "search (PMLR page)",
+  "text": "Guo, C., Pleiss, G., Sun, Y., Weinberger, K. Q. (2017). On calibration of modern neural networks. In \\emph{Proc. ICML}, PMLR 70, 1321--1330."
+ },
+ {
+  "key": "gulrajani2021domainbed",
+  "status": "search (ICLR page, arXiv)",
+  "text": "Gulrajani, I., Lopez-Paz, D. (2021). In search of lost domain generalization. In \\emph{Proc. ICLR}. arXiv:2007.01434."
+ },
+ {
+  "key": "kowsher2026",
+  "status": "abstract",
+  "text": "Kowsher, M., Zhan, W., Chen, C. (2026). A benchmark study of segmentation models and adaptation strategies for landslide detection from satellite imagery. arXiv:2604.16663."
+ },
+ {
+  "key": "liu2026geophys",
+  "status": "abstract",
+  "text": "Liu, Z., Kwan, M.-P., Wu, J., Li, H. (2026). GeoPhysAdapter: scale-matched geophysical adaptation for cross-domain landslide mapping with vision foundation models. arXiv:2608.09325."
+ },
+ {
+  "key": "li2025prithvi",
+  "status": "read (Tables 3 and 6, band-adaptation description via retrieval tool)",
+  "text": "Li, W., Wang, S., Lee, H., Lu, C., Roy, S., Ramachandran, R., Hsu, C.-Y. (2025). Landslide hazard mapping with geospatial foundation models: geographical generalizability, data scarcity, and band adaptability. arXiv:2511.04474."
+ },
+ {
+  "key": "szwarcman2024prithvi",
+  "status": "read (landslide task via retrieval tool); journal version unconfirmed",
+  "text": "Szwarcman, D., Roy, S., Fraccaro, P., et al. (2024). Prithvi-EO-2.0: a versatile multi-temporal foundation model for Earth observation applications. arXiv:2412.02732 (v3, 2026)."
+ },
+ {
+  "key": "vu2026clay",
+  "status": "abstract",
+  "text": "Vu, H. B. (2026). Clay-CNN hybrids: leveraging geospatial foundation models as auxiliary context for landslide detection. arXiv:2606.14081."
+ },
+ {
+  "key": "hou2024translandseg",
+  "status": "search",
+  "text": "Hou, C., Yu, J., Ge, D., Yang, L., Xi, L., Pang, Y., Wen, Y. (2024). TransLandSeg: a transfer learning approach for landslide semantic segmentation based on vision foundation model. arXiv:2403.10127."
+ },
+ {
+  "key": "chen2024ludas",
+  "status": "search",
+  "text": "Chen, W., Chen, Z., Song, D., He, H., Li, H., Zhu, Y. (2024). Landslide detection using the unsupervised domain-adaptive image segmentation method. \\emph{Land}, 13(7), 928. doi:10.3390/land13070928."
+ },
+ {
+  "key": "prakash2021",
+  "status": "search",
+  "text": "Prakash, N., Manconi, A., Loew, S. (2021). A new strategy to map landslides with a generalized convolutional neural network. \\emph{Sci. Rep.}, doi:10.1038/s41598-021-89015-8."
+ },
+ {
+  "key": "nava2026sar",
+  "status": "search",
+  "text": "Nava, L., Mondini, A., Bhuyan, K., Fang, C., Monserrat, O., Novellino, A., Catani, F. (2026). Sentinel-1 SAR-based globally distributed co-seismic landslide detection by deep neural networks. \\emph{Geosci. Model Dev.}, 19, 167--185. doi:10.5194/gmd-19-167-2026."
+ },
+ {
+  "key": "fan2025nsr",
+  "status": "search",
+  "text": "Fan, X., Wang, X., Fang, C., Jansen, J. D., Dai, L., Tanyas, H., Zang, N., Tang, R., Xu, Q., Huang, R. (2025). Deep learning can predict global earthquake-triggered landslides. \\emph{Natl. Sci. Rev.}, 12(7), nwaf179. doi:10.1093/nsr/nwaf179."
+ },
+ {
+  "key": "ge2023light",
+  "status": "search (authors from DOAJ listing)",
+  "text": "Ge, X., Zhao, Q., Wang, B., Chen, M. (2023). Lightweight landslide detection network for emergency scenarios. \\emph{Remote Sens.}, 15(4), 1085. doi:10.3390/rs15041085."
+ },
+ {
+  "key": "ni2026digsfnet",
+  "status": "search (authors from an alphaXiv listing, initials only; moderate confidence)",
+  "text": "Ni, Z., Hu, L., Wang, H., Li, F., Tang, M., Ma, G., Sui, H. (2026). DIGSFNet: deformation-integrity-guided symmetric fusion network for high-risk landslide extraction from multi-source remote sensing images. \\emph{Remote Sens.}, 18(16), 2692. doi:10.3390/rs18162692."
+ },
+ {
+  "key": "lu2024ms2",
+  "status": "reference list of [srivats2026]",
+  "text": "Lu, W., Hu, Y., Shao, W., Wang, H., Zhang, Z., Wang, M. (2024). A multiscale feature fusion enhanced CNN with the multiscale channel attention mechanism for efficient landslide detection (MS2LandsNet) using medium-resolution remote sensing data. \\emph{Int. J. Digit. Earth}, 17(1). doi:10.1080/17538947.2023.2300731."
+ },
+ {
+  "key": "iakubovskii2019smp",
+  "status": "package metadata read from the installed package",
+  "text": "Iakubovskii, P. Segmentation Models PyTorch (software), version 0.5.0 used for local profiling; MIT licence. \\url{https://github.com/qubvel-org/segmentation_models.pytorch}."
+ }
+]

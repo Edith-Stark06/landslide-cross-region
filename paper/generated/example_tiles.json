@@ -1,0 +1,43 @@
+﻿{
+    "provenance":  "Looked up on 2026-10-11 from examples_cas.npz of run xd_Bstrict_adapter_segformer_b0__holdout_cas seed 1 and the processed CAS meta.csv (script output copied; data drive disconnected when this file was written).",
+    "worst_six":  {
+                      "region":  "Hokkaido Iburi-Tobu",
+                      "sensor":  "Hokkaido Iburi-Tobu (3 m satellite subset)",
+                      "landslide_share":  [
+                                              0.016,
+                                              0.015,
+                                              0.01,
+                                              0.035,
+                                              0.036,
+                                              0.052
+                                          ],
+                      "tile_iou":  [
+                                       0,
+                                       0,
+                                       0,
+                                       0,
+                                       0,
+                                       0
+                                   ]
+                  },
+    "best_six":  {
+                     "region":  "Jiuzhai valley",
+                     "sensor":  "UAV 0.2 m",
+                     "landslide_share":  [
+                                             0.969,
+                                             0.065,
+                                             1,
+                                             1,
+                                             1,
+                                             1
+                                         ],
+                     "tile_iou":  [
+                                      0.93,
+                                      0.93,
+                                      0.94,
+                                      0.94,
+                                      0.97,
+                                      0.98
+                                  ]
+                 }
+}

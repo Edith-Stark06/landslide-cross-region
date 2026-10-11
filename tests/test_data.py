@@ -1,4 +1,4 @@
-import json
+﻿import json
 import sys
 from pathlib import Path
 
@@ -45,7 +45,7 @@ def test_unified_item(name, mode):
         assert np.all(it["image"][missing] == 0)
 
 
-PROTOCOL_FILES = ["protocol_A", "protocol_B", "protocol_B_strict"] + [p.stem for p in sorted((ROOT / "splits").glob("protocol_C_*.json"))]
+PROTOCOL_FILES = ["protocol_A", "protocol_B", "protocol_B_strict", "protocol_Bcomp"] + [p.stem for p in sorted((ROOT / "splits").glob("protocol_C_*.json"))]
 
 
 @pytest.mark.skipif(not {"gdcld", "l4s"} <= set(NAMES), reason="needs gdcld and l4s")
@@ -114,3 +114,4 @@ def test_no_group_straddles_when_groups_known():
         pytest.skip("run landslide.splits first")
     df = pd.read_csv(f)
     assert (df.groups_straddling_train_test[df.protocol.str.startswith(("B", "C"))] == 0).all()
+

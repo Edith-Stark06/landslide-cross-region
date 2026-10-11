@@ -1,0 +1,29 @@
+\begin{tabular}{llccc}
+\toprule
+Method & Held-out & Seed 0 & Seed 1 & Seed 2 \\
+\midrule
+U-Net (ResNet34) & L4S & 19.5 & 10.9 & 23.0 \\
+U-Net (ResNet34) & HR-GLDD & 29.9 & 28.2 & 33.1 \\
+U-Net (ResNet34) & GDCLD & 17.5 & 15.4 & 20.5 \\
+U-Net (ResNet34) & LMHLD & 18.2 & 15.5 & 19.0 \\
+U-Net (ResNet34) & CAS & 2.3 & 3.2 & 6.2 \\
+\midrule
+SegFormer-B0 & L4S & 24.1 & 9.0 & 7.0 \\
+SegFormer-B0 & HR-GLDD & 36.7 & 37.6 & 36.3 \\
+SegFormer-B0 & GDCLD & 28.6 & 28.7 & 28.3 \\
+SegFormer-B0 & LMHLD & 22.8 & 27.4 & 15.2 \\
+SegFormer-B0 & CAS & 22.1 & 22.8 & 18.8 \\
+\midrule
+SegFormer-B0 + band adapter & L4S & 19.5 & 10.7 & 8.9 \\
+SegFormer-B0 + band adapter & HR-GLDD & 41.1 & 39.3 & 37.8 \\
+SegFormer-B0 + band adapter & GDCLD & 28.9 & 30.5 & 29.4 \\
+SegFormer-B0 + band adapter & LMHLD & 18.1 & 22.9 & 16.8 \\
+SegFormer-B0 + band adapter & CAS & 20.6 & 15.7 & 17.0 \\
+\midrule
+SegFormer-B0 distilled student & L4S & 10.2 & 9.1 & -- \\
+SegFormer-B0 distilled student & HR-GLDD & 33.8 & -- & -- \\
+SegFormer-B0 distilled student & GDCLD & 27.4 & -- & -- \\
+SegFormer-B0 distilled student & LMHLD & 30.1 & -- & -- \\
+SegFormer-B0 distilled student & CAS & 13.1 & 17.1 & -- \\
+\bottomrule
+\end{tabular}

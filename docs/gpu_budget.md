@@ -49,3 +49,5 @@ Updated running total after xd-adapter and kd-a/kd-b: **~11.1 h** measured (+ hu
 
 Running total after seeds-a (2.7 h) and seeds-b (2.8 h): **~16.6 h** measured (+ hung smoke <= 6 h). Remaining of 30 h: ~13.4 h (7.4 h worst case). All 32 seed runs completed; none timed out.
 
+
+| 2026-10-12 | comp-a, comp-b (composition-matched control: SegFormer-B0, B-strict training sources LMHLD+CAS and size, events NOT removed; 5 folds x seeds 0,1,2 = 15 runs) | 15 | LAUNCHED. Estimate ~1.6 h total (15 x measured mean 388 s B-strict SegFormer fold + start-up), split over two kernels; cap 2,400 s per run | pending |

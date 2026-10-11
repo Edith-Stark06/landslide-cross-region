@@ -1,0 +1,16 @@
+\begin{tabular}{llllrrrrrrrr}
+\toprule
+Dataset & Input & Model & Params (M) & GFLOPs & mIoU & IoU & F1 & Prec. & Rec. & PR-AUC & ECE \\
+\midrule
+L4S & 14 bands & U-Net R34 & 24.5 & 2.1 & 73.3 & 48.0 & 64.9 & 62.9 & 67.1 & 0.673 & 0.010 \\
+L4S & 14 bands & DeepLabV3+ R34 & 22.5 & 2.1 & 71.9 & 45.3 & 62.3 & 58.3 & 66.9 & 0.636 & 0.011 \\
+L4S & 14 bands & SegFormer-B0 & 3.7 & 0.4 & 72.6 & 46.7 & 63.7 & 57.3 & 71.6 & 0.657 & 0.010 \\
+L4S & RGB & U-Net R34 & 24.4 & 2.0 & 68.2 & 37.9 & 54.9 & 71.7 & 44.5 & 0.572 & 0.011 \\
+L4S & RGB & SegFormer-B0 & 3.7 & 0.4 & 68.8 & 39.2 & 56.3 & 63.1 & 50.8 & 0.556 & 0.011 \\
+L4S & bank (9 of 11 slots) & SegFormer-B0 + adapter & 3.7 & 0.4 & 70.2 & 42.2 & 59.4 & 51.5 & 70.2 & 0.604 & 0.011 \\
+GDCLD & RGB & U-Net R34 & 24.4 & 7.8 & 69.0 & 38.7 & 55.8 & 68.5 & 47.1 & 0.604 & 0.005 \\
+GDCLD & RGB & DeepLabV3+ R34 & 22.4 & 7.9 & 67.0 & 34.8 & 51.7 & 63.2 & 43.7 & 0.562 & 0.005 \\
+GDCLD & RGB & SegFormer-B0 & 3.7 & 1.7 & 70.1 & 40.9 & 58.1 & 72.6 & 48.4 & 0.654 & 0.004 \\
+GDCLD & RGB & SegFormer-B0, 60 epochs & 3.7 & 1.7 & 69.6 & 40.0 & 57.1 & 61.2 & 53.6 & 0.529 & 0.005 \\
+\bottomrule
+\end{tabular}

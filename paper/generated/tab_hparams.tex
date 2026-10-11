@@ -1,0 +1,18 @@
+\begin{tabular}{lll}
+\toprule
+Setting & Cross-dataset runs (B, B-strict) & In-dataset runs (A) \\
+\midrule
+Epochs & 10 & 50 (L4S), 20 (GDCLD) \\
+Batch size & 32 & 32 \\
+Input & RGB, random 128 px crops at native scale & native channels (L4S), RGB (GDCLD); full tiles \\
+Optimiser & AdamW & AdamW \\
+Learning rate / weight decay, SegFormer-B0 & 0.0002 / 0.01 & 0.0002 / 0.01 \\
+Learning rate / weight decay, U-Net & 0.0003 / 0.0001 & 0.0003 / 0.0001 \\
+Schedule & cosine annealing to zero & cosine annealing to zero \\
+Loss & cross-entropy + soft Dice & cross-entropy + soft Dice \\
+Augmentation & flips, 90$^\circ$ rotations, random crop & flips, 90$^\circ$ rotations \\
+Validation set (checkpoint selection) & $\leq$3{,}000 random tiles of the training datasets' validation splits & official validation split \\
+Precision & mixed (fp16 autocast) & mixed (fp16 autocast) \\
+Teacher / distillation & \multicolumn{2}{l}{SegFormer-B3, LoRA rank 8 on 140 linear layers, 10 epochs; $\alpha=0.5$, $T=2.0$} \\
+\bottomrule
+\end{tabular}
