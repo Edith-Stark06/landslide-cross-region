@@ -29,5 +29,8 @@ Rule: no kernel is launched without writing its estimated hours here first; the 
 Running total of measured kernel time this week (2026-10-11): smoke 0.05 + l4s 0.45 + gdcld 1.55 + gdcld-e60 1.17 + failed launches 0.1 + xd-unet 0.75 + xd-segformer 1.78 = **5.85 h**, plus the hung first smoke kernel (unknown, <= 6 h). Remaining of 30 h: 24.1 h, or 18.1 h if the hung kernel is counted in full. Check Kaggle's own quota page for the true figure.
 
 | 2026-10-11 | xd-fixbgr (B-strict, HR-GLDD fold, corrected channel order; SegFormer-B0 + U-Net) | 2 | 1,356 s job time + ~1 min start-up = ~0.4 h (estimate 0.35 h) | 6.25 h (before xd-sized) |
-| 2026-10-11 | xd-sized (plain B, training cut to B-strict size, SegFormer-B0, 5 folds) | 5 | LAUNCHED. Estimate ~0.6 h (B-strict SegFormer took 1,806 s; same train sizes); cap 2,400 s per job | pending |
+| 2026-10-11 | xd-sized (plain B, training cut to B-strict size, SegFormer-B0, 5 folds) | 5 | 2,297 s job time + ~1 min start-up = ~0.65 h (estimate 0.6 h) | 6.9 h |
+
+
+Updated running total after xd-fixbgr and xd-sized: **6.9 h** measured (+ hung smoke <= 6 h). Remaining of 30 h: 23.1 h (17.1 h worst case).
 
