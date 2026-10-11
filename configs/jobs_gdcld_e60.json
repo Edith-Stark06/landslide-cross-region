@@ -1,0 +1,3 @@
+[
+  {"config": "configs/baseline_gdcld_segformer_b0_e60.yaml", "seeds": [0], "timeout_s": 6600}
+]

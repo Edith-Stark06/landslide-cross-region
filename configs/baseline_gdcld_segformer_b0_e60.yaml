@@ -1,0 +1,13 @@
+# Under-training check: identical to baseline_gdcld_segformer_b0 except 60 epochs instead of 20.
+name: baseline_gdcld_segformer_b0_e60
+protocol: protocol_A
+fold: gdcld
+model: segformer_b0
+mode: rgb
+pretrained: true
+epochs: 60
+batch_size: 32
+lr: 0.0002
+weight_decay: 0.01
+num_workers: 2
+seed: 0

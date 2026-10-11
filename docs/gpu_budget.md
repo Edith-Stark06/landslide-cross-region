@@ -19,3 +19,4 @@ Measured throughput (T4, AMP, batch 32): L4S 128 px, 3,799 tiles -> ~9-11 s/epoc
 Rule: no kernel is launched without writing its estimated hours here first; the remaining budget is re-checked after each.
 
 
+| 2026-10-11 | gdcld-e60 (SegFormer-B0, 60 ep, 1 seed; under-training check) | 1 | LAUNCHED. Estimate ~1.3 h (3x the measured 1,462 s); hard cap 6,600 s | pending |
