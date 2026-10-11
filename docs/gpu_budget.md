@@ -23,3 +23,4 @@ Rule: no kernel is launched without writing its estimated hours here first; the 
 
 | 2026-10-11 | xd-segformer (SegFormer-B0, protocol B-strict then B, 5 folds each, 10 ep, 128 px crops, 1 seed) | 10 | LAUNCHED. Estimate ~1.9 h (from measured ~11 Mpx/s training); per-fold cap 2,400 s | pending |
 | 2026-10-11 | xd-unet (U-Net, protocol B-strict, 5 folds, 10 ep) | 5 | LAUNCHED. Estimate ~0.9 h (U-Net measured 1.55x slower than SegFormer-B0); per-fold cap 2,400 s | pending |
+| 2026-10-11 | xd kernels, failed launches (dataset list passed as one string; 3 pushes) | - | ~0.05 h each, ~0.1 h total, jobs failed within seconds | +0.1 h |

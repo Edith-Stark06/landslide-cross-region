@@ -48,6 +48,10 @@ for d in INPUT.rglob("meta.csv"):                       # dataset dirs hold imag
     if slug.startswith("landslide-xr-") and not (proc / slug.removeprefix("landslide-xr-")).exists():
         (proc / slug.removeprefix("landslide-xr-")).symlink_to(d.parent)
 print("datasets:", sorted(p.name for p in proc.iterdir()), flush=True)
+if not any(proc.iterdir()):                       # fail fast and show what Kaggle actually mounted
+    for p in sorted(INPUT.glob("*"))[:30]:
+        print("  /kaggle/input/" + p.name, [c.name for c in sorted(p.glob("*"))[:8]], flush=True)
+    sys.exit("no landslide-xr-* data datasets are mounted")
 
 env = dict(os.environ, LANDSLIDE_PROCESSED=str(proc), PYTHONPATH=str(code / "src"),
            GIT_HASH=(code / "GIT_HASH").read_text().strip() if (code / "GIT_HASH").exists() else "unknown")

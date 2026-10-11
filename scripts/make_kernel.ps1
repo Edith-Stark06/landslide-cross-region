@@ -2,6 +2,7 @@
 # Usage: powershell -File scripts/make_kernel.ps1 -Name landslide-xr-smoke -Datasets l4s [-Push]
 param([Parameter(Mandatory=$true)][string]$Name, [Parameter(Mandatory=$true)][string[]]$Datasets, [string]$JobsName = "jobs.json", [switch]$Push)
 $root = Split-Path -Parent $PSScriptRoot
+$Datasets = @($Datasets | ForEach-Object { $_ -split ',' } | Where-Object { $_ })   # -File passes "a,b,c" as ONE string
 $dir = Join-Path $root ".cache\kernels\$Name"
 New-Item -ItemType Directory -Force -Path $dir | Out-Null
 (Get-Content (Join-Path $root "scripts\kaggle_entry.py") -Raw) -replace 'JOBS_FILE = "jobs.json"', "JOBS_FILE = `"$JobsName`"" | Set-Content (Join-Path $dir "entry.py") -Encoding utf8
