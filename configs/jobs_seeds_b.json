@@ -1,0 +1,56 @@
+[
+ {
+  "config": "configs/xd_Bstrict_adapter_segformer_b0__holdout_l4s.yaml",
+  "seeds": [
+   1,
+   2
+  ],
+  "timeout_s": 2400
+ },
+ {
+  "config": "configs/xd_Bstrict_adapter_segformer_b0__holdout_hrgldd.yaml",
+  "seeds": [
+   1,
+   2
+  ],
+  "timeout_s": 2400
+ },
+ {
+  "config": "configs/xd_Bstrict_adapter_segformer_b0__holdout_gdcld.yaml",
+  "seeds": [
+   1,
+   2
+  ],
+  "timeout_s": 2400
+ },
+ {
+  "config": "configs/xd_Bstrict_adapter_segformer_b0__holdout_lmhld.yaml",
+  "seeds": [
+   1,
+   2
+  ],
+  "timeout_s": 2400
+ },
+ {
+  "config": "configs/xd_Bstrict_adapter_segformer_b0__holdout_cas.yaml",
+  "seeds": [
+   1,
+   2
+  ],
+  "timeout_s": 2400
+ },
+ {
+  "config": "configs/xd_Bstrict_kd_segformer_b0__holdout_l4s.yaml",
+  "seeds": [
+   1
+  ],
+  "timeout_s": 4200
+ },
+ {
+  "config": "configs/xd_Bstrict_kd_segformer_b0__holdout_cas.yaml",
+  "seeds": [
+   1
+  ],
+  "timeout_s": 4200
+ }
+]

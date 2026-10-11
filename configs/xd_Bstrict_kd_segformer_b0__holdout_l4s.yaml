@@ -19,3 +19,4 @@ teacher_epochs: 10
 teacher_lr: 0.0002
 kd_alpha: 0.5
 kd_temp: 2.0
+save_examples: true

@@ -39,5 +39,10 @@ Updated running total after xd-fixbgr and xd-sized: **6.9 h** measured (+ hung s
 | 2026-10-11 | l4srefs (in-dataset L4S: RGB SegFormer-B0, RGB U-Net, SegFormer-B0 + adapter) | 3 | 1,325 s job time + ~1 min start-up = ~0.38 h (estimate 0.45 h) | ~7.3 h |
 | 2026-10-11 | smoke-kd (LoRA teacher + KD path, tiny) | 1 | LAUNCHED. Estimate ~0.05 h; cap 900 s | pending |
 | 2026-10-11 | smokekd (LoRA teacher + KD smoke) | 1 | 52 s job time + start-up = ~0.03 h | ~7.4 h |
-| 2026-10-11 | kd-a (folds l4s, hrgldd) and kd-b (folds gdcld, lmhld, cas): SegFormer-B3 LoRA r=8 teacher (10 ep) + SegFormer-B0 student with KD (10 ep), B-strict, RGB | 5 | LAUNCHED. Estimate kd-a ~0.9 h, kd-b ~0.8 h (teacher ~2.1x and student ~1.7x the measured SegFormer-B0 fold times); cap 4,200 s per fold | pending |
+| 2026-10-11 | kd-a (folds l4s, hrgldd) and kd-b (folds gdcld, lmhld, cas): SegFormer-B3 LoRA r=8 teacher (10 ep) + SegFormer-B0 student with KD (10 ep), B-strict, RGB | 5 | kd-a 5,045 s + kd-b 5,362 s job time = 2.9 h incl. start-up (estimate 1.7 h: the LoRA teacher ran ~1.6x its estimated time because every fold trains the B3 teacher first) | ~11.1 h |
+
+
+Updated running total after xd-adapter and kd-a/kd-b: **~11.1 h** measured (+ hung smoke <= 6 h). Remaining of 30 h: ~18.9 h (12.9 h worst case).
+| 2026-10-11 | seeds-a (SegFormer-B0 RGB + U-Net, B-strict, seeds 1,2, 5 folds: 20 runs) | 20 | LAUNCHED. Estimate ~2.5 h (2 x 0.5 h + 2 x 0.75 h measured); cap 2,400 s per run | pending |
+| 2026-10-11 | seeds-b (adapter seeds 1,2 on 5 folds + distilled student seed 1 on l4s and cas) | 12 | LAUNCHED. Estimate ~2.7 h (2 x 0.8 h + ~1.1 h measured); cap 2,400 s per adapter run, 4,200 s per KD run | pending |
 
