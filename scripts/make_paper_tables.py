@@ -4,6 +4,7 @@ Run: python -I scripts/make_paper_tables.py  ->  results/tables/paper_tables.md
 Cells without a run print 'n/a'. Cells with >1 seed print mean +- std (n); single-seed cells print the value and '(n=1)'.
 """
 import json
+import re
 from pathlib import Path
 
 import numpy as np
@@ -12,7 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 RUNS = {}
 for f in sorted((ROOT / "results" / "runs").glob("*/result.json")):
     r = json.loads(f.read_text())
-    RUNS.setdefault((r["config"]["name"], r["config"]["fold"]), []).append(r)
+    # the adapter configs carry the fold inside `name` (xd_..._adapter_...__holdout_X); strip it so name identifies the method only
+    RUNS.setdefault((re.sub(r"__holdout_\w+$", "", r["config"]["name"]), r["config"]["fold"]), []).append(r)
 DS = ["l4s", "hrgldd", "gdcld", "lmhld", "cas"]
 NAMES = {"l4s": "L4S", "hrgldd": "HR-GLDD", "gdcld": "GDCLD", "lmhld": "LMHLD", "cas": "CAS"}
 

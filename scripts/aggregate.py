@@ -3,6 +3,7 @@
 Run: python -I scripts/aggregate.py
 """
 import json
+import re
 from pathlib import Path
 
 import numpy as np
@@ -14,7 +15,7 @@ for f in sorted((ROOT / "results" / "runs").glob("*/result.json")):
     r = json.loads(f.read_text())
     for ds, m in r["test"].items():
         m = {k: v for k, v in m.items() if k != "by_group"}
-        rows.append(dict(run=r["run_id"], name=r["config"]["name"], model=r["config"]["model"], fold=r["config"]["fold"], seed=r["seed"],
+        rows.append(dict(run=r["run_id"], name=re.sub(r"__holdout_\w+$", "", r["config"]["name"]), model=r["config"]["model"], fold=r["config"]["fold"], seed=r["seed"],
                          test_dataset=ds, mIoU=100 * m["miou"], IoU_landslide=100 * m["iou_landslide"], F1=100 * m["f1"],
                          precision=100 * m["precision"], recall=100 * m["recall"], PR_AUC=m["pr_auc"], ECE=m["ece"],
                          params_M=r["n_params"] / 1e6, GFLOPs=r["gflops_at_input"], input_px=r["input_hw"], train_s=r["train_seconds"],

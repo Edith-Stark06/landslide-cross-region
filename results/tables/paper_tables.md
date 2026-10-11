@@ -5,6 +5,9 @@
 | L4S | 14 bands | U-Net R34 | 24.5 | 2.1 | 73.3 | 48.0 | 64.9 | 62.9 | 67.1 | 0.673 | 0.010 |
 | L4S | 14 bands | DeepLabV3+ R34 | 22.5 | 2.1 | 71.9 | 45.3 | 62.3 | 58.3 | 66.9 | 0.636 | 0.011 |
 | L4S | 14 bands | SegFormer-B0 | 3.7 | 0.4 | 72.6 | 46.7 | 63.7 | 57.3 | 71.6 | 0.657 | 0.010 |
+| L4S | RGB | U-Net R34 | 24.4 | 2.0 | 68.2 | 37.9 | 54.9 | 71.7 | 44.5 | 0.572 | 0.011 |
+| L4S | RGB | SegFormer-B0 | 3.7 | 0.4 | 68.8 | 39.2 | 56.3 | 63.1 | 50.8 | 0.556 | 0.011 |
+| L4S | bank (adapter) | SegFormer-B0 + adapter | 3.7 | 0.4 | 70.2 | 42.2 | 59.4 | 51.5 | 70.2 | 0.604 | 0.011 |
 | GDCLD | RGB | U-Net R34 | 24.4 | 7.8 | 69.0 | 38.7 | 55.8 | 68.5 | 47.1 | 0.604 | 0.005 |
 | GDCLD | RGB | DeepLabV3+ R34 | 22.4 | 7.9 | 67.0 | 34.8 | 51.7 | 63.2 | 43.7 | 0.562 | 0.005 |
 | GDCLD | RGB | SegFormer-B0 | 3.7 | 1.7 | 70.1 | 40.9 | 58.1 | 72.6 | 48.4 | 0.654 | 0.004 |
@@ -16,7 +19,7 @@
 |---|---|---|---|---|---|
 | U-Net R34 | 19.5 | 29.9 | 17.5 | 18.2 | 2.3 |
 | SegFormer-B0 | 24.1 | 36.7 | 28.6 | 22.8 | 22.1 |
-| SegFormer-B0 + band adapter | n/a | n/a | n/a | n/a | n/a |
+| SegFormer-B0 + band adapter | 19.5 | 41.1 | 28.9 | 18.1 | 20.6 |
 | SegFormer-B0 student (distilled) | n/a | n/a | n/a | n/a | n/a |
 
 ### Table: cross-dataset, protocol B-strict (event-isolated leave-one-dataset-out), F1
@@ -25,7 +28,7 @@
 |---|---|---|---|---|---|
 | U-Net R34 | 32.6 | 46.0 | 29.8 | 30.7 | 4.4 |
 | SegFormer-B0 | 38.9 | 53.7 | 44.4 | 37.1 | 36.2 |
-| SegFormer-B0 + band adapter | n/a | n/a | n/a | n/a | n/a |
+| SegFormer-B0 + band adapter | 32.7 | 58.3 | 44.8 | 30.7 | 34.1 |
 | SegFormer-B0 student (distilled) | n/a | n/a | n/a | n/a | n/a |
 
 ### Table: cross-dataset, protocol B-strict (event-isolated leave-one-dataset-out), ECE
@@ -34,7 +37,7 @@
 |---|---|---|---|---|---|
 | U-Net R34 | 0.012 | 0.062 | 0.052 | 0.178 | 0.145 |
 | SegFormer-B0 | 0.002 | 0.052 | 0.042 | 0.042 | 0.108 |
-| SegFormer-B0 + band adapter | n/a | n/a | n/a | n/a | n/a |
+| SegFormer-B0 + band adapter | 0.004 | 0.050 | 0.039 | 0.044 | 0.111 |
 | SegFormer-B0 student (distilled) | n/a | n/a | n/a | n/a | n/a |
 
 ### Table: effect of event overlap, SegFormer-B0, landslide IoU (protocol B vs size-matched B vs B-strict)

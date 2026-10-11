@@ -22,8 +22,11 @@ DS = ["l4s", "hrgldd", "gdcld", "lmhld", "cas"]
 
 
 def load(name, fold):
-    f = RUNS / f"{name}__{fold}__seed0" / "result.json"
-    return json.loads(f.read_text()) if f.exists() else None
+    for d in (f"{name}__{fold}__seed0", f"{name}__{fold}__{fold}__seed0"):     # adapter configs carry the fold in their name too
+        f = RUNS / d / "result.json"
+        if f.exists():
+            return json.loads(f.read_text())
+    return None
 
 
 def strict_mean(name_for):
