@@ -1,0 +1,201 @@
+{
+ "config": {
+  "name": "xd_Bstrict_kd_segformer_b0",
+  "protocol": "protocol_B_strict",
+  "fold": "holdout_hrgldd",
+  "model": "segformer_b0",
+  "encoder": "resnet34",
+  "mode": "rgb",
+  "pretrained": true,
+  "epochs": 10,
+  "batch_size": 32,
+  "lr": 0.0002,
+  "weight_decay": 0.01,
+  "crop": 128,
+  "max_val": 3000,
+  "num_workers": 3,
+  "seed": 0,
+  "teacher_model": "segformer_b3",
+  "teacher_lora_rank": 8,
+  "teacher_epochs": 10,
+  "teacher_lr": 0.0002,
+  "kd_alpha": 0.5,
+  "kd_temp": 2.0
+ },
+ "seed": 0,
+ "run_id": "xd_Bstrict_kd_segformer_b0__holdout_hrgldd__seed0",
+ "code_revision": "b52e02f30ab991393b175bb71598e89e1ee806c2",
+ "torch": "2.11.0+cu128",
+ "device": "Tesla T4",
+ "n_params": 3714658,
+ "n_trainable": 3714658,
+ "gflops_at_input": 0.424493056,
+ "input_hw": 128,
+ "n_train": 25014,
+ "n_val": 3000,
+ "n_test": 1758,
+ "best_epoch": 8,
+ "best_val_iou": 0.4447408134078313,
+ "history": [
+  {
+   "epoch": 0,
+   "train_loss": 0.3875741937630613,
+   "val_iou": 0.41634084927659865,
+   "seconds": 110.13917016983032
+  },
+  {
+   "epoch": 1,
+   "train_loss": 0.28500922148267377,
+   "val_iou": 0.3382406688756203,
+   "seconds": 207.72655582427979
+  },
+  {
+   "epoch": 2,
+   "train_loss": 0.26655604504287317,
+   "val_iou": 0.3812815133829304,
+   "seconds": 305.8800983428955
+  },
+  {
+   "epoch": 3,
+   "train_loss": 0.2520998572208054,
+   "val_iou": 0.3933045321097919,
+   "seconds": 404.8554346561432
+  },
+  {
+   "epoch": 4,
+   "train_loss": 0.24107893591653676,
+   "val_iou": 0.42411358348937767,
+   "seconds": 503.09500074386597
+  },
+  {
+   "epoch": 5,
+   "train_loss": 0.2271520027583143,
+   "val_iou": 0.4112524787767261,
+   "seconds": 600.8135499954224
+  },
+  {
+   "epoch": 6,
+   "train_loss": 0.22117779170199942,
+   "val_iou": 0.4002196171289122,
+   "seconds": 699.2980563640594
+  },
+  {
+   "epoch": 7,
+   "train_loss": 0.2123432978415306,
+   "val_iou": 0.44393982045326214,
+   "seconds": 797.1196892261505
+  },
+  {
+   "epoch": 8,
+   "train_loss": 0.20883726227489538,
+   "val_iou": 0.4447408134078313,
+   "seconds": 896.5439665317535
+  },
+  {
+   "epoch": 9,
+   "train_loss": 0.20772888234765216,
+   "val_iou": 0.43776015849451866,
+   "seconds": 993.8460648059845
+  }
+ ],
+ "train_seconds": 993.858193397522,
+ "test": {
+  "hrgldd": {
+   "iou_landslide": 0.3377164141149721,
+   "miou": 0.6288622367980701,
+   "f1": 0.50491480937401,
+   "precision": 0.7464105531127054,
+   "recall": 0.3814873367457082,
+   "n_pixels": 28803072,
+   "pos_pixel_ratio": 0.10273327789480233,
+   "pr_auc": 0.6199703796764544,
+   "ece": 0.05573989500147742
+  }
+ },
+ "teacher": {
+  "test": {
+   "hrgldd": {
+    "iou_landslide": 0.3859807305586777,
+    "miou": 0.6549107677483631,
+    "f1": 0.5569784947915798,
+    "precision": 0.7450505027629314,
+    "recall": 0.4447187832245253,
+    "n_pixels": 28803072,
+    "pos_pixel_ratio": 0.10273327789480233,
+    "pr_auc": 0.639338311217027,
+    "ece": 0.04952599899760684
+   }
+  },
+  "history": [
+   {
+    "epoch": 0,
+    "train_loss": 0.5346578445080453,
+    "val_iou": 0.4616056708036288,
+    "seconds": 180.10523390769958
+   },
+   {
+    "epoch": 1,
+    "train_loss": 0.42166739557219834,
+    "val_iou": 0.4803636832382864,
+    "seconds": 333.45125246047974
+   },
+   {
+    "epoch": 2,
+    "train_loss": 0.3981194807724519,
+    "val_iou": 0.48352222703854797,
+    "seconds": 486.19564843177795
+   },
+   {
+    "epoch": 3,
+    "train_loss": 0.3805352935755909,
+    "val_iou": 0.5027884625217152,
+    "seconds": 643.8015038967133
+   },
+   {
+    "epoch": 4,
+    "train_loss": 0.3713974722597877,
+    "val_iou": 0.49015600190489006,
+    "seconds": 795.5171508789062
+   },
+   {
+    "epoch": 5,
+    "train_loss": 0.36189668531149205,
+    "val_iou": 0.47077943559138374,
+    "seconds": 946.4143652915955
+   },
+   {
+    "epoch": 6,
+    "train_loss": 0.3576010547473397,
+    "val_iou": 0.48985186078478077,
+    "seconds": 1096.4081847667694
+   },
+   {
+    "epoch": 7,
+    "train_loss": 0.3493960697237264,
+    "val_iou": 0.4989490209833085,
+    "seconds": 1246.2558424472809
+   },
+   {
+    "epoch": 8,
+    "train_loss": 0.345386520371547,
+    "val_iou": 0.4958772826743991,
+    "seconds": 1396.9460680484772
+   },
+   {
+    "epoch": 9,
+    "train_loss": 0.3474081149861388,
+    "val_iou": 0.49563551084769897,
+    "seconds": 1547.6517398357391
+   }
+  ],
+  "best_val_iou": 0.5027884625217152,
+  "best_epoch": 3,
+  "train_seconds": 1547.7340061664581,
+  "n_params": 45686466,
+  "n_trainable": 1614338,
+  "gflops_at_input": 2.34303488,
+  "input_hw": 128,
+  "lora_rank": 8,
+  "model": "segformer_b3"
+ }
+}

@@ -1,0 +1,108 @@
+{
+ "config": {
+  "name": "xd_Bstrict_unet",
+  "protocol": "protocol_B_strict",
+  "fold": "holdout_lmhld",
+  "model": "unet",
+  "encoder": "resnet34",
+  "mode": "rgb",
+  "pretrained": true,
+  "epochs": 10,
+  "batch_size": 32,
+  "lr": 0.0003,
+  "weight_decay": 0.0001,
+  "crop": 128,
+  "max_val": 3000,
+  "num_workers": 3,
+  "seed": 0
+ },
+ "seed": 0,
+ "run_id": "xd_Bstrict_unet__holdout_lmhld__seed0",
+ "code_revision": "ff5b9559c22c2e57412bdc2b57c0c7dee64e97de",
+ "torch": "2.11.0+cu128",
+ "device": "Tesla T4",
+ "n_params": 24436514,
+ "gflops_at_input": 1.955856384,
+ "input_hw": 128,
+ "n_train": 5526,
+ "n_val": 3000,
+ "n_test": 25365,
+ "best_epoch": 1,
+ "best_val_iou": 0.21509908923665008,
+ "history": [
+  {
+   "epoch": 0,
+   "train_loss": 0.9220565217871999,
+   "val_iou": 0.078776173404652,
+   "seconds": 26.786606073379517
+  },
+  {
+   "epoch": 1,
+   "train_loss": 0.6347163335181946,
+   "val_iou": 0.21509908923665008,
+   "seconds": 51.26081132888794
+  },
+  {
+   "epoch": 2,
+   "train_loss": 0.5997336912293767,
+   "val_iou": 0.12424209703928879,
+   "seconds": 75.50395727157593
+  },
+  {
+   "epoch": 3,
+   "train_loss": 0.5697802294825398,
+   "val_iou": 0.19876255003532328,
+   "seconds": 99.64977049827576
+  },
+  {
+   "epoch": 4,
+   "train_loss": 0.561293902265471,
+   "val_iou": 0.05854717121353347,
+   "seconds": 124.04486417770386
+  },
+  {
+   "epoch": 5,
+   "train_loss": 0.5392781146043955,
+   "val_iou": 0.15998966894477054,
+   "seconds": 148.40137910842896
+  },
+  {
+   "epoch": 6,
+   "train_loss": 0.5282430835934573,
+   "val_iou": 0.14816749025851286,
+   "seconds": 172.577974319458
+  },
+  {
+   "epoch": 7,
+   "train_loss": 0.511378409384295,
+   "val_iou": 0.06167886031539531,
+   "seconds": 196.81436896324158
+  },
+  {
+   "epoch": 8,
+   "train_loss": 0.5020786314163097,
+   "val_iou": 0.08218528437888213,
+   "seconds": 221.08656072616577
+  },
+  {
+   "epoch": 9,
+   "train_loss": 0.49105559635994045,
+   "val_iou": 0.0848573052316522,
+   "seconds": 245.4405596256256
+  }
+ ],
+ "train_seconds": 245.44078993797302,
+ "test": {
+  "lmhld": {
+   "iou_landslide": 0.18150273825737542,
+   "miou": 0.4544104842844648,
+   "f1": 0.30724048684789823,
+   "precision": 0.20190086832075368,
+   "recall": 0.6424121602690209,
+   "n_pixels": 415580160,
+   "pos_pixel_ratio": 0.08875870060784423,
+   "pr_auc": 0.2073178078712541,
+   "ece": 0.17779294161203457
+  }
+ }
+}

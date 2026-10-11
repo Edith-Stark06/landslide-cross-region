@@ -1,0 +1,108 @@
+{
+ "config": {
+  "name": "xd_Bstrict_fixbgr_segformer_b0",
+  "protocol": "protocol_B_strict",
+  "fold": "holdout_hrgldd",
+  "model": "segformer_b0",
+  "encoder": "resnet34",
+  "mode": "rgb",
+  "pretrained": true,
+  "epochs": 10,
+  "batch_size": 32,
+  "crop": 128,
+  "max_val": 3000,
+  "num_workers": 3,
+  "seed": 0,
+  "lr": 0.0002,
+  "weight_decay": 0.01
+ },
+ "seed": 0,
+ "run_id": "xd_Bstrict_fixbgr_segformer_b0__holdout_hrgldd__seed0",
+ "code_revision": "89480ae1e0d7519a25aabfe5f779fd5766553ac3",
+ "torch": "2.11.0+cu128",
+ "device": "Tesla T4",
+ "n_params": 3714658,
+ "gflops_at_input": 0.424493056,
+ "input_hw": 128,
+ "n_train": 25014,
+ "n_val": 3000,
+ "n_test": 1758,
+ "best_epoch": 7,
+ "best_val_iou": 0.41134104166245544,
+ "history": [
+  {
+   "epoch": 0,
+   "train_loss": 0.5756955817437203,
+   "val_iou": 0.3350330138160132,
+   "seconds": 187.19996166229248
+  },
+  {
+   "epoch": 1,
+   "train_loss": 0.4704932290178255,
+   "val_iou": 0.3566482771590481,
+   "seconds": 237.64994764328003
+  },
+  {
+   "epoch": 2,
+   "train_loss": 0.44571132114617373,
+   "val_iou": 0.4036343036587652,
+   "seconds": 287.02438950538635
+  },
+  {
+   "epoch": 3,
+   "train_loss": 0.42759958373218127,
+   "val_iou": 0.38055894629082443,
+   "seconds": 336.1443684101105
+  },
+  {
+   "epoch": 4,
+   "train_loss": 0.41720116081219477,
+   "val_iou": 0.4031795028630136,
+   "seconds": 385.3272488117218
+  },
+  {
+   "epoch": 5,
+   "train_loss": 0.3972681851225229,
+   "val_iou": 0.391394492043298,
+   "seconds": 434.87667870521545
+  },
+  {
+   "epoch": 6,
+   "train_loss": 0.3872344697254415,
+   "val_iou": 0.39436867885019256,
+   "seconds": 484.38304138183594
+  },
+  {
+   "epoch": 7,
+   "train_loss": 0.3759143975075625,
+   "val_iou": 0.41134104166245544,
+   "seconds": 533.4973654747009
+  },
+  {
+   "epoch": 8,
+   "train_loss": 0.3667895152077327,
+   "val_iou": 0.40167775192097543,
+   "seconds": 583.4682822227478
+  },
+  {
+   "epoch": 9,
+   "train_loss": 0.3648618399028436,
+   "val_iou": 0.4057487275227559,
+   "seconds": 633.9372563362122
+  }
+ ],
+ "train_seconds": 633.9376072883606,
+ "test": {
+  "hrgldd": {
+   "iou_landslide": 0.36706573961671485,
+   "miou": 0.6438946320809391,
+   "f1": 0.5370125649104626,
+   "precision": 0.7209451044684158,
+   "recall": 0.4278551716539925,
+   "n_pixels": 28803072,
+   "pos_pixel_ratio": 0.10273327789480233,
+   "pr_auc": 0.6332187468230981,
+   "ece": 0.05220209590838117
+  }
+ }
+}
