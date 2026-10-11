@@ -20,7 +20,7 @@
 | U-Net R34 | 19.5 | 29.9 | 17.5 | 18.2 | 2.3 |
 | SegFormer-B0 | 24.1 | 36.7 | 28.6 | 22.8 | 22.1 |
 | SegFormer-B0 + band adapter | 19.5 | 41.1 | 28.9 | 18.1 | 20.6 |
-| SegFormer-B0 student (distilled) | n/a | n/a | n/a | n/a | n/a |
+| SegFormer-B0 student (distilled) | 10.2 | 33.8 | 27.4 | 30.1 | 13.1 |
 
 ### Table: cross-dataset, protocol B-strict (event-isolated leave-one-dataset-out), F1
 
@@ -29,7 +29,7 @@
 | U-Net R34 | 32.6 | 46.0 | 29.8 | 30.7 | 4.4 |
 | SegFormer-B0 | 38.9 | 53.7 | 44.4 | 37.1 | 36.2 |
 | SegFormer-B0 + band adapter | 32.7 | 58.3 | 44.8 | 30.7 | 34.1 |
-| SegFormer-B0 student (distilled) | n/a | n/a | n/a | n/a | n/a |
+| SegFormer-B0 student (distilled) | 18.5 | 50.5 | 43.0 | 46.3 | 23.2 |
 
 ### Table: cross-dataset, protocol B-strict (event-isolated leave-one-dataset-out), ECE
 
@@ -38,7 +38,7 @@
 | U-Net R34 | 0.012 | 0.062 | 0.052 | 0.178 | 0.145 |
 | SegFormer-B0 | 0.002 | 0.052 | 0.042 | 0.042 | 0.108 |
 | SegFormer-B0 + band adapter | 0.004 | 0.050 | 0.039 | 0.044 | 0.111 |
-| SegFormer-B0 student (distilled) | n/a | n/a | n/a | n/a | n/a |
+| SegFormer-B0 student (distilled) | 0.020 | 0.056 | 0.041 | 0.027 | 0.119 |
 
 ### Table: effect of event overlap, SegFormer-B0, landslide IoU (protocol B vs size-matched B vs B-strict)
 
@@ -49,6 +49,16 @@
 | GDCLD | 45.3 | 38.9 | 28.6 |
 | LMHLD | 24.9 | 19.4 | 22.8 |
 | CAS | 48.3 | 46.7 | 22.1 |
+
+### Table: teacher (SegFormer-B3 + LoRA) vs distilled student (SegFormer-B0), B-strict, landslide IoU
+
+| Held-out | Teacher | Student (KD) | Student (no KD) |
+|---|---|---|---|
+| L4S | 22.7 | 10.2 | 24.1 |
+| HR-GLDD | 38.6 | 33.8 | 36.7 |
+| GDCLD | 33.3 | 27.4 | 28.6 |
+| LMHLD | 30.1 | 30.1 | 22.8 |
+| CAS | 26.3 | 13.1 | 22.1 |
 
 ### Table: per-region / per-event landslide IoU, SegFormer-B0 (plain B cut to B-strict size, seed 0)
 

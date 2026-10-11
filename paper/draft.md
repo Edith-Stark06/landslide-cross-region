@@ -190,16 +190,37 @@ data volume, about 10 points overlap), and L4S, LMHLD and HR-GLDD change by 3 po
 Event overlap therefore inflates the cross-dataset score substantially on two of five datasets and negligibly on the rest. The plain-B
 runs for HR-GLDD were made with the wrong channel order and are not reported.
 
-### 5.4 Band adapter *[PENDING]*
+### 5.4 Band adapter
 
 In-dataset on L4S, SegFormer-B0 with the adapter (9 of 14 bands) reaches landslide IoU 42.2, between the RGB-only model (39.2) and the model
-whose first layer reads all 14 bands (46.7). *[PENDING: cross-dataset B-strict results, running.]*
+whose first layer reads all 14 bands (46.7). Cross-dataset under B-strict (seed 0) the adapter gives landslide IoU of 19.5 (L4S), 41.1
+(HR-GLDD), 28.9 (GDCLD), 18.1 (LMHLD) and 20.6 (CAS), against 24.1, 36.7, 28.6, 22.8 and 22.1 for RGB-only SegFormer-B0: a mean of 25.6
+against 26.9. The adapter therefore did **not** improve cross-dataset transfer on average in our setting; it helped clearly on HR-GLDD
+(+4.4) and hurt on L4S and LMHLD (about -4.6 each). With one seed these differences cannot be told apart from run-to-run variation.
+*[PENDING: seeds 1 and 2, running.]* The adapter adds 0.01 GFLOPs and no measurable CPU latency (§5.6), and lets one model accept RGB,
+4-band and 14-band data, which is its practical benefit. A plausible but untested reason for the lack of gain is that most training
+sensors in a B-strict fold provide only RGB, so extra bands are rarely informative during training.
 
-### 5.5 Teacher and distillation *[PENDING]*
+### 5.5 Teacher and distillation
 
-### 5.6 Efficiency and calibration *[PENDING]* 
-Parameters and GFLOPs are available for all runs (SegFormer-B0 3.7 M / 0.4 GFLOPs at 128 px; U-Net 24.4 M / 2.0 GFLOPs). *[PENDING: CPU latency,
-reliability diagrams, Pareto plot.]*
+A SegFormer-B3 teacher (45.7 M parameters; LoRA rank 8 on 140 attention and MLP linear layers of the frozen encoder, 1.61 M trainable
+parameters including the decoder, 3.5%) was trained for 10 epochs in each B-strict fold and then distilled into SegFormer-B0 (alpha 0.5,
+T 2). Landslide IoU (seed 0): teacher 22.7 / 38.6 / 33.3 / 30.1 / 26.3 on L4S / HR-GLDD / GDCLD / LMHLD / CAS, mean 30.2, which is 3.3 above
+the RGB SegFormer-B0 (mean 26.9) and 4 times its size. The **distilled student did not beat the undistilled student**: 10.2 / 33.8 / 27.4 /
+30.1 / 13.1, mean 22.9, against 24.1 / 36.7 / 28.6 / 22.8 / 22.1 for the same student without distillation (it was better only on
+LMHLD, +7.3, and much worse on L4S, -13.9, and CAS, -9.0). We report this as a negative result for this configuration and a single seed;
+the L4S and CAS collapses are being re-run with another seed to check whether they are instabilities of one run. We did not tune alpha,
+temperature or LoRA rank, and did not run the planned rank or distillation-type ablations because of the GPU budget.
+
+### 5.6 Efficiency and calibration
+
+CPU latency was measured on a laptop (Intel Core i5-1135G7, 4 threads, batch 1, fp32, median of 30 runs, random weights). At 128 px:
+SegFormer-B0 22 ms (3.7 M parameters, 0.42 GFLOPs), SegFormer-B0 with the adapter 23 ms, U-Net 45 ms (24.4 M, 1.96 GFLOPs), DeepLabV3+
+53 ms (22.4 M), SegFormer-B3 teacher 88 ms (44.6 M, 2.26 GFLOPs); at 256 px, 78, 88, 141, 139 and 289 ms. Single-thread numbers are noisier
+(`results/tables/latency_cpu.md`). SegFormer-B0 is both faster and, in the B-strict experiments, more accurate than the U-Net (Figure 1).
+These are laptop-CPU figures, not measurements on a Jetson or other edge device. Pixel-level ECE is low for in-dataset runs (0.004 to 0.011)
+and higher on unseen datasets (up to 0.108 for SegFormer-B0 and 0.178 for the U-Net on LMHLD); reliability diagrams will be added from the
+seed runs, which store the bins. *[PENDING: reliability diagram, failure-case figure.]*
 
 ## 6 Limitations
 
