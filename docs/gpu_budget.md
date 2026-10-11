@@ -36,3 +36,5 @@ Updated running total after xd-fixbgr and xd-sized: **6.9 h** measured (+ hung s
 
 | 2026-10-11 | xd-adapter (SegFormer-B0 + band adapter, B-strict, 5 folds, 10 ep) | 5 | LAUNCHED. Estimate ~0.7 h (RGB SegFormer B-strict took 0.6 h; +11-channel loading); cap 2,400 s per job | pending |
 | 2026-10-11 | l4s-refs (in-dataset L4S: RGB SegFormer-B0, RGB U-Net, SegFormer-B0 + adapter; 50 ep) | 3 | LAUNCHED. Estimate ~0.45 h (3 x ~460-575 s measured); cap 1,800 s per job | pending |
+| 2026-10-11 | l4srefs (in-dataset L4S: RGB SegFormer-B0, RGB U-Net, SegFormer-B0 + adapter) | 3 | 1,325 s job time + ~1 min start-up = ~0.38 h (estimate 0.45 h) | ~7.3 h |
+| 2026-10-11 | smoke-kd (LoRA teacher + KD path, tiny) | 1 | LAUNCHED. Estimate ~0.05 h; cap 900 s | pending |

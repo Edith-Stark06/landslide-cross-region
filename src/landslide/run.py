@@ -2,10 +2,14 @@
 
     python -m landslide.run --config configs/baseline_l4s_unet.yaml [--seed 1] [--out results/runs]
 
-Config keys: name, protocol (splits/<protocol>.json), fold, model (unet|deeplabv3plus|segformer_b0), encoder, mode (native|rgb|bank),
-pretrained, epochs, batch_size, lr, weight_decay, crop, seed, num_workers, max_train/max_eval (optional subsampling for smoke tests).
+Config keys: name, protocol (splits/<protocol>.json), fold, model (unet|deeplabv3plus|segformer_b0|segformer_b3, optionally prefixed
+adapter_), encoder, mode (native|rgb|bank), pretrained, epochs, batch_size, lr, weight_decay, crop, seed, num_workers,
+max_train / max_val / max_test / max_eval (optional subsampling).
+Distillation (optional): teacher_model (e.g. segformer_b3), teacher_lora_rank (0 = full fine-tuning), teacher_epochs, teacher_lr,
+kd_alpha, kd_temp. The teacher is trained first in the same job (same train/val data), evaluated on the test set, frozen, and then
+guides the student with  (1-a)*CE+Dice + a*T^2*KL(teacher_T || student_T).
 Writes <out>/<name>__<fold>__seed<k>/result.json with config, seed, code revision, library versions, per-epoch history and test metrics.
-Test data are touched once, with the weights of the best validation epoch.
+Test data are touched once per model, with the weights of the best validation epoch.
 """
 from __future__ import annotations
 
@@ -15,7 +19,6 @@ import json
 import os
 import random
 import subprocess
-import sys
 import time
 from pathlib import Path
 
@@ -51,6 +54,8 @@ def build_model(cfg: dict, in_ch: int):
         return smp.DeepLabV3Plus(cfg.get("encoder", "resnet34"), encoder_weights=w, in_channels=in_ch, classes=2)
     if kind == "segformer_b0":
         return smp.Segformer("mit_b0", encoder_weights=w, in_channels=in_ch, classes=2)
+    if kind == "segformer_b3":
+        return smp.Segformer("mit_b3", encoder_weights=w, in_channels=in_ch, classes=2)
     raise ValueError(kind)
 
 
@@ -69,6 +74,11 @@ def loss_fn(logits, y):
     return ce + dice
 
 
+def forward(model, b, device):
+    x = b["image"].to(device, non_blocking=True)
+    return model(x, b["avail"].to(device)) if getattr(model, "needs_avail", False) else model(x)
+
+
 def evaluate(model, refs, cfg, device, batch_size=16, workers=2):
     import torch
     from torch.utils.data import DataLoader
@@ -83,9 +93,8 @@ def evaluate(model, refs, cfg, device, batch_size=16, workers=2):
         model.eval()
         with torch.no_grad():
             for b in DataLoader(ds, batch_size=batch_size, shuffle=False, num_workers=workers):
-                x = b["image"].to(device)
                 with torch.autocast(device_type=device.type, enabled=device.type == "cuda"):
-                    logits = model(x, b["avail"].to(device)) if getattr(model, "needs_avail", False) else model(x)
+                    logits = forward(model, b, device)
                 p = torch.softmax(logits.float(), 1)[:, 1].cpu().numpy()
                 t = b["mask"].numpy()
                 meter.update(p, t)
@@ -99,11 +108,64 @@ def evaluate(model, refs, cfg, device, batch_size=16, workers=2):
     return out
 
 
-def main(argv=None) -> dict:
+def fit(model, train_ds, val, cfg, device, seed, epochs, lr, wd, tag, teacher=None):
+    """Train `model` on train_ds; return the best-validation-IoU weights. With a frozen `teacher`, adds the distillation term."""
     import torch
     from torch.utils.data import DataLoader
 
+    from .lora import kd_loss
+    params = [p for p in model.parameters() if p.requires_grad]
+    opt = torch.optim.AdamW(params, lr=lr, weight_decay=wd)
+    sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=epochs)
+    scaler = torch.amp.GradScaler(enabled=device.type == "cuda")
+    nw = cfg.get("num_workers", 2)
+    loader = DataLoader(train_ds, batch_size=cfg.get("batch_size", 32), shuffle=True, drop_last=True, num_workers=nw,
+                        persistent_workers=nw > 0, generator=torch.Generator().manual_seed(seed))
+    history, best, best_state, best_ep, t0 = [], -1.0, None, 0, time.time()
+    for ep in range(epochs):
+        model.train()
+        tot, n = 0.0, 0
+        for b in loader:
+            y = b["mask"].to(device, non_blocking=True)
+            with torch.autocast(device_type=device.type, enabled=device.type == "cuda"):
+                logits = forward(model, b, device)
+                if teacher is not None:
+                    with torch.no_grad():
+                        t_logits = forward(teacher, b, device)
+            loss = loss_fn(logits.float(), y)
+            if teacher is not None:
+                loss = kd_loss(logits.float(), t_logits.float(), loss, cfg.get("kd_alpha", 0.5), cfg.get("kd_temp", 2.0))
+            opt.zero_grad(set_to_none=True)
+            scaler.scale(loss).backward(); scaler.step(opt); scaler.update()
+            tot += loss.item() * len(y); n += len(y)
+        sched.step()
+        v = evaluate(model, val, cfg, device)
+        v_iou = float(np.mean([m["iou_landslide"] for m in v.values()]))
+        history.append(dict(epoch=ep, train_loss=tot / max(1, n), val_iou=v_iou, seconds=time.time() - t0))
+        print(f"[{tag}] ep {ep} loss {tot / max(1, n):.4f} val IoU(landslide) {v_iou:.4f}", flush=True)
+        if v_iou > best:
+            best, best_state, best_ep = v_iou, copy.deepcopy({k: t.detach().cpu() for k, t in model.state_dict().items()}), ep
+    model.load_state_dict(best_state)
+    return dict(history=history, best_val_iou=best, best_epoch=best_ep, train_seconds=time.time() - t0)
+
+
+def profile(model, in_ch, h, device):
+    import torch
+    from torch.utils.flop_counter import FlopCounterMode
+
+    from .lora import count_params
+    total, trainable = count_params(model)
+    model.eval()
+    with FlopCounterMode(display=False) as fc, torch.no_grad():
+        model(torch.zeros(1, in_ch, h, h, device=device))     # avail defaults to all-ones in the adapter wrapper
+    return dict(n_params=total, n_trainable=trainable, gflops_at_input=fc.get_total_flops() / 2e9, input_hw=h)
+
+
+def main(argv=None) -> dict:
+    import torch
+
     from . import data
+    from .lora import apply_lora
 
     ap = argparse.ArgumentParser()
     ap.add_argument("--config", required=True)
@@ -128,55 +190,44 @@ def main(argv=None) -> dict:
     # max_eval is set explicitly (smoke tests).
     train = sub(splits["train"], cfg.get("max_train"))
     val = sub(splits["val"], cfg.get("max_val", cfg.get("max_eval")))
-    test = sub(splits["test"], cfg.get("max_test", cfg.get("max_eval")))
+    test_refs = sub(splits["test"], cfg.get("max_test", cfg.get("max_eval")))
 
     seed_everything(seed)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     train_ds = data.LandslideDataset(train, mode=cfg["mode"], augment=True, seed=seed, crop=cfg.get("crop"))
     in_ch = train_ds[0]["image"].shape[0]
-    model = build_model(cfg, in_ch).to(device)
-    n_params = sum(p.numel() for p in model.parameters())
-    opt = torch.optim.AdamW(model.parameters(), lr=cfg.get("lr", 3e-4), weight_decay=cfg.get("weight_decay", 1e-4))
-    epochs = int(cfg.get("epochs", 30))
-    sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=epochs)
-    scaler = torch.amp.GradScaler(enabled=device.type == "cuda")
-    loader = DataLoader(train_ds, batch_size=cfg.get("batch_size", 32), shuffle=True, drop_last=True, num_workers=cfg.get("num_workers", 2),
-                        persistent_workers=cfg.get("num_workers", 2) > 0, generator=torch.Generator().manual_seed(seed))
-
-    history, best, best_state, t0 = [], -1.0, None, time.time()
-    for ep in range(epochs):
-        model.train()
-        tot, n = 0.0, 0
-        for b in loader:
-            x, y = b["image"].to(device, non_blocking=True), b["mask"].to(device, non_blocking=True)
-            with torch.autocast(device_type=device.type, enabled=device.type == "cuda"):
-                logits = model(x, b["avail"].to(device)) if getattr(model, "needs_avail", False) else model(x)
-            loss = loss_fn(logits.float(), y)
-            opt.zero_grad(set_to_none=True)
-            scaler.scale(loss).backward(); scaler.step(opt); scaler.update()
-            tot += loss.item() * len(x); n += len(x)
-        sched.step()
-        v = evaluate(model, val, cfg, device)
-        v_iou = float(np.mean([m["iou_landslide"] for m in v.values()]))
-        history.append(dict(epoch=ep, train_loss=tot / max(1, n), val_iou=v_iou, seconds=time.time() - t0))
-        print(f"[{run_id}] ep {ep} loss {tot / max(1, n):.4f} val IoU(landslide) {v_iou:.4f}", flush=True)
-        if v_iou > best:
-            best, best_state = v_iou, copy.deepcopy({k: t.detach().cpu() for k, t in model.state_dict().items()})
-            best_ep = ep
-    train_seconds = time.time() - t0
-    model.load_state_dict(best_state)
-    n_test = len(test)
-    test = evaluate(model, test, cfg, device)
-
-    from torch.utils.flop_counter import FlopCounterMode
     h = int(cfg.get("crop") or train_ds[0]["image"].shape[1])
-    model.eval()
-    with FlopCounterMode(display=False) as fc, torch.no_grad():
-        model(torch.zeros(1, in_ch, h, h, device=device))     # avail defaults to all-ones in the adapter wrapper
+
+    teacher, teacher_res = None, None
+    if cfg.get("teacher_model"):
+        prefix = "adapter_" if cfg["mode"] == "bank" else ""
+        teacher = build_model(dict(cfg, model=prefix + cfg["teacher_model"]), in_ch).to(device)
+        rank = int(cfg.get("teacher_lora_rank", 0))
+        if rank > 0:
+            inner = teacher.net if hasattr(teacher, "net") else teacher
+            n_wrapped = apply_lora(inner.encoder, rank)
+            print(f"[teacher] LoRA rank {rank} on {n_wrapped} linear layers", flush=True)
+            teacher.to(device)
+        fit_t = fit(teacher, train_ds, val, cfg, device, seed, int(cfg.get("teacher_epochs", cfg.get("epochs", 10))),
+                    cfg.get("teacher_lr", 2e-4), cfg.get("teacher_weight_decay", 0.01), f"{run_id}:teacher")
+        teacher_res = dict(test=evaluate(teacher, test_refs, cfg, device), **fit_t, **profile(teacher, in_ch, h, device),
+                           lora_rank=rank, model=cfg["teacher_model"])
+        teacher.eval()
+        for p in teacher.parameters():
+            p.requires_grad = False
+
+    model = build_model(cfg, in_ch).to(device)
+    fit_s = fit(model, train_ds, val, cfg, device, seed, int(cfg.get("epochs", 30)), cfg.get("lr", 3e-4), cfg.get("weight_decay", 1e-4),
+                run_id, teacher=teacher)
+    test = evaluate(model, test_refs, cfg, device)
+    prof = profile(model, in_ch, h, device)
     result = dict(config=cfg, seed=seed, run_id=run_id, code_revision=code_revision(), torch=torch.__version__,
-                  device=torch.cuda.get_device_name(0) if device.type == "cuda" else "cpu", n_params=n_params,
-                  gflops_at_input=fc.get_total_flops() / 2e9, input_hw=h, n_train=len(train), n_val=len(val), n_test=n_test,
-                  best_epoch=best_ep, best_val_iou=best, history=history, train_seconds=train_seconds, test=test)
+                  device=torch.cuda.get_device_name(0) if device.type == "cuda" else "cpu", n_params=prof["n_params"],
+                  n_trainable=prof["n_trainable"], gflops_at_input=prof["gflops_at_input"], input_hw=prof["input_hw"],
+                  n_train=len(train), n_val=len(val), n_test=len(test_refs), best_epoch=fit_s["best_epoch"],
+                  best_val_iou=fit_s["best_val_iou"], history=fit_s["history"], train_seconds=fit_s["train_seconds"], test=test)
+    if teacher_res is not None:
+        result["teacher"] = teacher_res
     (out_dir / "result.json").write_text(json.dumps(result, indent=1))
     print(json.dumps({k: result["test"][k] for k in result["test"]}, indent=1))
     return result

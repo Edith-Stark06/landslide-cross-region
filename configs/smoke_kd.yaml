@@ -1,0 +1,23 @@
+# Smoke test of the LoRA teacher + distillation path (tiny; NOT results)
+name: smoke_kd
+protocol: protocol_B_strict
+fold: holdout_l4s
+model: segformer_b0
+mode: rgb
+pretrained: true
+epochs: 1
+batch_size: 16
+lr: 0.0002
+weight_decay: 0.01
+crop: 128
+max_train: 128
+max_val: 64
+max_test: 64
+num_workers: 2
+teacher_model: segformer_b3
+teacher_lora_rank: 8
+teacher_epochs: 1
+teacher_lr: 0.0002
+kd_alpha: 0.5
+kd_temp: 2.0
+seed: 0

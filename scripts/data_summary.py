@@ -1,4 +1,4 @@
-"""Data summary table computed from the processed tiles (every number is measured, none quoted).
+﻿"""Data summary table computed from the processed tiles (every number is measured, none quoted).
 
 Run: python -I scripts/data_summary.py   -> results/data_summary.csv and results/data_summary.md
 """
@@ -17,7 +17,7 @@ LICENCE = {  # from the Zenodo records / READMEs read in verification_log.md
     "lmhld": "CC BY-4.0 (Zenodo 17258777)", "cas": "CC BY-NC-4.0 (Zenodo 10294997)",
 }
 CITE = {
-    "l4s": "Ghorbanzadeh et al. 2022 (arXiv 2206.00515)", "hrgldd": "Meena et al. 2023, ESSD 15, 3283",
+    "l4s": "Ghorbanzadeh et al. 2022 (arXiv 2206.00515)", "hrgldd": "ESSD 15, 3283 (2023); author list not captured, UNVERIFIED",
     "gdcld": "Fang et al. 2024, ESSD 16, 4817", "lmhld": "Liu et al. 2025, arXiv 2502.19866",
     "cas": "Xu et al. 2024, Sci Data 11, 12",
 }
@@ -42,3 +42,4 @@ out.mkdir(exist_ok=True)
 df.to_csv(out / "data_summary.csv", index=False)
 (out / "data_summary.md").write_text(df.to_markdown(index=False) if hasattr(df, "to_markdown") else df.to_string(index=False), encoding="utf-8")
 print(df.to_string(index=False))
+
