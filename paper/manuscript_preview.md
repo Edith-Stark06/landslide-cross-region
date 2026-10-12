@@ -1,4 +1,4 @@
-# How far do compact models transfer across landslide datasets? An event-isolated evaluation with calibration and CPU-latency evidence
+# Event-Isolated Evaluation of Compact Models for Cross-Dataset Landslide Segmentation
 
 *Preview rendered from `manuscript.tex` by `scripts/make_preview.py`; the .tex is authoritative. Citation and cross-reference numbers are reconstructed.*
 
@@ -9,12 +9,12 @@
 Landslide segmentation models are usually trained and tested inside a single benchmark, often with random tile splits, so published scores do not show whether a model works in a new region.
 We convert five public datasets (Landslide4Sense, HR-GLDD, GDCLD, LMHLD and CAS Landslide; 69,305 tiles after conversion) to one format and evaluate leave-one-dataset-out transfer under an *event-isolated* protocol that removes every training tile sharing a documented physical event with the held-out dataset; 10 of the 24 events we document appear in more than one dataset.
 Over 3 seeds, a compact SegFormer-B0 (3.7 M parameters) reached a mean landslide IoU of 24.4 ± 2.9 over the five held-out datasets and a ResNet34 U-Net 17.5 ± 2.9, at 22 ms and 45 ms per 128 px tile on a laptop CPU. The ranking is not uniform (the U-Net has the higher mean on Landslide4Sense), and seed-to-seed variation is large on some datasets (standard deviation up to 9.4 IoU points).
-A control that keeps overlapping events but matches the training-set size indicates that removing shared events lowers IoU by about 24.6 points on CAS and 10.3 points on GDCLD (single seed), and by less than the seed noise on Landslide4Sense and LMHLD.
-A learned band adapter (23.8 ± 1.8) and distillation from a LoRA-adapted SegFormer-B3 teacher (distilled student 22.9, one complete seed) did not improve transfer over the plain RGB model. Models were over-confident on unseen datasets (mean expected calibration error 0.055 ± 0.006 for SegFormer-B0 and 0.087 ± 0.003 for the U-Net).
+Because Hokkaido 2018 appears in all five datasets, the B-strict training tiles come only from LMHLD and CAS. A composition-matched control that keeps these two sources and the training-set size but retains event-sharing tiles shows that event overlap raises landslide IoU by 16.8 points on GDCLD and 6.5 points on CAS, with no detectable effect on the other three datasets (three seeds).
+A learned band adapter (23.8 ± 1.8) and distillation from a LoRA-adapted SegFormer-B3 teacher (distilled student 22.9, one complete seed) did not improve transfer over the plain RGB model. Models were generally over-confident on unseen datasets (mean expected calibration error 0.055 ± 0.006 for SegFormer-B0 and 0.087 ± 0.003 for the U-Net).
 We also document a channel-order problem in HR-GLDD that, uncorrected, collapses transfer to that dataset.
 The evidence is limited to RGB inputs, short training, one compact architecture family, and single-seed controls; these limits and the negative results are reported alongside the findings.
 
-**Keywords:** landslide segmentation; cross-region generalisation; event-isolated evaluation; SegFormer; model calibration; edge inference
+**Keywords:** landslide segmentation; cross-region generalisation; event-isolated evaluation; SegFormer; model calibration; CPU inference
 
 ## 1. Introduction
 
@@ -24,11 +24,11 @@ Evaluation on unseen regions and events does exist, but under different protocol
 
 We ask four questions. **RQ1:** How much does event overlap inflate leave-one-dataset-out scores? **RQ2:** How do a compact transformer (SegFormer-B0) and a ResNet34 CNN compare under event-isolated transfer? **RQ3:** Do a learned band adapter and distillation from a LoRA-adapted larger teacher improve the compact model? **RQ4:** How well calibrated and how fast are these models on a CPU?
 
-**Contributions.**  (i) An event-isolated multi-dataset protocol with an automated leakage report and an event inventory for five public datasets (Section 3). (ii) A measurement of the effect of event overlap, using a size-matched control that separates it from the effect of having less training data (Section 6.3). (iii) A three-seed comparison of SegFormer-B0 and a U-Net, with the cost of each, that shows how much single-seed rankings can mislead (Sections 6.2 and 6.6). (iv) Two negative results, for a band adapter and for distillation from a LoRA teacher, reported with their limits (Sections 6.4 and 6.5). (v) Calibration, failure-case and data-quality findings, including a channel-order problem that changes a result by an order of magnitude (Sections 6.7 and 3.4). We do not claim a new state-of-the-art score, and published numbers are quoted only where we read them in the source and are labelled as such.
+**Contributions.**  (i) An event-isolated multi-dataset protocol with an automated leakage report and an event inventory for five public datasets (Section 3). (ii) A measurement of the effect of event overlap, using a size-matched and a composition-matched control that separate it from the effects of having less training data and of losing source datasets (Section 6.3). (iii) A three-seed comparison of SegFormer-B0 and a U-Net, with the cost of each, that shows how much single-seed rankings can mislead (Sections 6.2 and 6.6). (iv) Two negative results, for a band adapter and for distillation from a LoRA teacher, reported with their limits (Sections 6.4 and 6.5). (v) Calibration, failure-case and data-quality findings, including a channel-order problem that changes a result by an order of magnitude (Sections 6.7 and 3.4). We do not claim a new state-of-the-art score, and published numbers are quoted only where we read them in the source and are labelled as such.
 
 ## 2. Related work
 
-**Datasets.**  The Landslide4Sense competition released 128 px patches with 14 Sentinel-2 and terrain bands [9]. GDCLD offers 1024 px RGB tiles from nine earthquake events, with separate validation and test events [10]. CAS Landslide combines satellite and UAV imagery from several regions [11], HR-GLDD offers 3 m PlanetScope patches [12], and LMHLD offers patches from five sensors and seven study areas [13]. Sen12Landslides adds Sentinel-1/2 time series [14]; we did not use it because of its size. We found that none of these datasets except LMHLD and CAS exposes an event or region identifier per tile (Section 3).
+**Datasets.**  The Landslide4Sense competition released 128 px patches with 14 Sentinel-2 and terrain bands [9]. GDCLD offers 1024 px RGB tiles from nine earthquake events, with separate validation and test events [10]. CAS Landslide combines satellite and UAV imagery from several regions [11], HR-GLDD offers 3 m PlanetScope patches [12], and LMHLD offers patches from five sensors and seven study areas [13]. Sen12Landslides adds Sentinel-1/2 time series [14]; we did not use it because of its size. We found that none of these datasets except LMHLD and CAS (and the GDCLD test images) exposes an event or region identifier per tile (Section 3).
 
 **Cross-region and cross-event generalisation.**  Prakash et al. [3] train a CNN progressively on combined inventories and report a Matthews correlation coefficient of 0.69 in unseen regions. Nava et al. [4] report F1 up to 82% on two unseen events for Sentinel-1-based models trained on 11 events. Fan et al. [5] predict landslide probability for earthquakes worldwide, which is a related but different task. Chen et al. [15] apply unsupervised domain adaptation with inter-domain translation to landslide segmentation, and GeoPhysAdapter [6] adapts a frozen vision foundation model with terrain, material and rainfall priors on an event-isolated benchmark. General domain-generalisation work cautions that carefully tuned empirical risk minimisation is a strong baseline and that model selection is part of the method [16]; we therefore use plain empirical risk minimisation and report how checkpoints are selected.
 
@@ -54,7 +54,7 @@ Table 1 summarises the five datasets after conversion; every value is measured o
 
 ### 3.2 Event inventory and event isolation
 
-The same physical event is imaged by several datasets: from the dataset papers and READMEs we document 24 events, of which 10 occur in at least two of the five datasets, 5 in at least three, and 1 event (Hokkaido 2018) in all five (Figure 1; Appendix Table 12). A plain leave-one-dataset-out split can therefore train on the very event it is tested on. Event assignments come from dataset papers and READMEs; some rely on place names and are treated conservatively as the same event when plausible (for example, two CAS sites imaged in the same 2022 campaign in Sichuan are both assigned to the 2022 Luding earthquake). Residual overlap therefore cannot be excluded.
+The same physical event is imaged by several datasets: from the dataset papers and READMEs we document 24 events, of which 10 occur in at least two of the five datasets, 5 in at least three, and 1 event (Hokkaido 2018) in all five (Figure 1; Appendix Table 14). A plain leave-one-dataset-out split can therefore train on the very event it is tested on. Event assignments come from dataset papers and READMEs; some rely on place names and are treated conservatively as the same event when plausible (for example, two CAS sites imaged in the same 2022 campaign in Sichuan are both assigned to the 2022 Luding earthquake). Residual overlap therefore cannot be excluded.
 
 ![](../figures/fig_data_overview.png)
 
@@ -62,7 +62,23 @@ The same physical event is imaged by several datasets: from the dataset papers a
 
 ### 3.3 Protocols
 
-**Protocol A (in-dataset)** uses the official split. LMHLD's official split is a random tile split inside each event, so all its events appear in both train and test, and GDCLD's test events are probably also present among its training tiles; protocol A numbers for these two datasets are therefore not event-isolated. **Protocol B (leave-one-dataset-out)** tests on every tile of the held-out dataset and trains and validates on the official train and validation tiles of the other four. **Protocol B-strict** additionally removes every training tile whose documented event also occurs in the held-out dataset (per tile for LMHLD and CAS, which carry event identifiers; the whole dataset for datasets without them). B-strict therefore trains on 5,526 to 25,014 tiles instead of 30,767 to 47,401 for protocol B. **Protocol C** (leave-one-event/region-out inside LMHLD and CAS) was defined and its splits checked for leakage, but was not run (Section 8).
+**Protocol A (in-dataset)** uses the official split. LMHLD's official split is a random tile split inside each event, so all its events appear in both train and test; protocol A numbers for LMHLD are therefore not event-isolated. For GDCLD the dataset paper describes training and validation tiles drawn from five events at a 3:1 ratio and test images from four different events [10], so, according to that description, the GDCLD test split is event-isolated from its training data while its validation split shares events with it (we cannot verify this ourselves because its training and validation tiles carry no event identifier). **Protocol B (leave-one-dataset-out)** tests on every tile of the held-out dataset and trains and validates on the official train and validation tiles of the other four. **Protocol B-strict** additionally removes every training tile whose documented event also occurs in the held-out dataset (per tile for LMHLD and CAS, which carry event identifiers; the whole dataset for datasets without them). B-strict therefore trains on 5,526 to 25,014 tiles instead of 30,767 to 47,401 for protocol B. **An important consequence (Table 2):** because Hokkaido 2018 is present in all five datasets and Landslide4Sense, HR-GLDD and GDCLD carry no tile-level event identifier, B-strict drops those three datasets entirely in every fold, so *its training tiles come only from LMHLD and CAS*. B-strict is therefore a transfer from two source datasets with high-resolution RGB/NIR imagery, and differs from protocol B in the sources of its training data as well as in event overlap; Section 6.3 addresses this confound with a composition-matched control. **Protocol C** (leave-one-event/region-out inside LMHLD and CAS) was defined and its splits checked for leakage, but was not run (Section 8).
+
+| Protocol | Held-out | Training tiles from source dataset |  |  |  |  |
+|–-|–-|–-|–-|–-|–-|–-|
+|  |  | L4S | HR-GLDD | GDCLD | LMHLD | CAS |
+| B | L4S | – | 1,119 | 11,162 | 17,753 | 14,687 |
+| B | HR-GLDD | 3,799 | – | 11,162 | 17,753 | 14,687 |
+| B | GDCLD | 3,799 | 1,119 | – | 17,753 | 14,687 |
+| B | LMHLD | 3,799 | 1,119 | 11,162 | – | 14,687 |
+| B | CAS | 3,799 | 1,119 | 11,162 | 17,753 | – |
+| B-strict | L4S | – | – | – | 8,363 | 13,203 |
+| B-strict | HR-GLDD | – | – | – | 11,811 | 13,203 |
+| B-strict | GDCLD | – | – | – | 14,500 | 4,709 |
+| B-strict | LMHLD | – | – | – | – | 5,526 |
+| B-strict | CAS | – | – | – | 12,678 | – |
+
+*Source datasets of the training tiles in each fold. Under B-strict only LMHLD and CAS contribute.*
 
 An automated report checks, for every fold, overlapping tile references, groups straddling train and test, byte-identical tiles across train and test, and documented events shared between train and test. All are zero for B, B-strict and C. Protocol A contains one byte-identical near-black no-data crop in GDCLD. Byte hashing cannot detect overlapping neighbouring tiles; this is controlled only by splitting at event or region level.
 
@@ -80,7 +96,7 @@ An automated report checks, for every fold, overlapping tile references, groups 
 
 ### 4.1 Models and training
 
-We use ResNet34-encoder U-Net [26] and DeepLabV3+ [27] and the MiT-B0 SegFormer [28] (3.7 M parameters) from the `segmentation_models_pytorch` library [29], with ImageNet-pretrained encoders. Cross-dataset runs use RGB (the only input all datasets provide), random 128 px crops at native scale (so that 128 px and 256 px datasets mix without rescaling), flips and 90° rotations, 10 epochs, batch size 32, AdamW, cosine learning-rate decay, mixed precision and a loss of cross-entropy plus soft Dice (all settings: Appendix Table 13). The weights of the epoch with the best validation landslide IoU are used once on the test set. In cross-dataset runs the per-epoch validation set is a random subset of at most 3,000 tiles of the training datasets' validation splits; test data are never subsampled. In-dataset L4S models read all 14 native bands. No per-dataset hyper-parameter tuning was done; the settings were fixed in advance for each protocol family, apart from the two decisions disclosed in Section 5.
+We use ResNet34-encoder U-Net [26] and DeepLabV3+ [27] and the MiT-B0 SegFormer [28] (3.7 M parameters) from the `segmentation_models_pytorch` library [29], with ImageNet-pretrained encoders. Cross-dataset runs use RGB (the only input all datasets provide), random 128 px crops at native scale (so that 128 px and 256 px datasets mix without rescaling), flips and 90° rotations, 10 epochs, batch size 32, AdamW, cosine learning-rate decay, mixed precision and a loss of cross-entropy plus soft Dice (all settings: Appendix Table 15). The weights of the epoch with the best validation landslide IoU are used once on the test set. In cross-dataset runs the per-epoch validation set is a random subset of at most 3,000 tiles of the training datasets' validation splits; test data are never subsampled. In-dataset L4S models read all 14 native bands. No per-dataset hyper-parameter tuning was done; the settings were fixed in advance for each protocol family, apart from the two decisions disclosed in Section 5.
 
 ### 4.2 Band adapter
 
@@ -104,13 +120,13 @@ Four kinds of statements appear below: (E1) values we measured, each generated f
 
 ## 5. Experimental design and disclosures
 
-Each cross-dataset configuration was run with seeds 0, 1 and 2, except the distilled student (seed 0 on all folds, a second seed on two folds) and the controls and teacher (seed 0). In-dataset baselines are single-seed. Two decisions were informed by test results, and we disclose them: (1) after observing the failure on the held-out HR-GLDD fold we examined the channel order and changed the mapping (Section 3.4); (2) we trained SegFormer-B0 on GDCLD for 60 instead of 20 epochs to check for under-training, compared the test results, and kept 20 epochs, which were also not worse on test. Otherwise no model was selected using test data.
+Each cross-dataset configuration was run with seeds 0, 1 and 2, except the distilled student (seed 0 on all folds, a second seed on two folds), the plain-B and size-matched controls and the teacher (seed 0); the composition-matched control has seeds 0, 1 and 2. In-dataset baselines are single-seed. Two decisions were informed by test results, and we disclose them: (1) after observing the failure on the held-out HR-GLDD fold we examined the channel order and changed the mapping (Section 3.4); (2) we trained SegFormer-B0 on GDCLD for 60 instead of 20 epochs to check for under-training, compared the test results, and kept 20 epochs, which were also not worse on test. Otherwise no model was selected using test data.
 
 ## 6. Results
 
 ### 6.1 In-dataset baselines
 
-Table 2 gives protocol A results (single seed). On Landslide4Sense with all 14 bands the U-Net reaches a landslide IoU of 48.0 and SegFormer-B0 46.7; restricted to RGB they fall to 37.9 and 39.2, and the band adapter on 9 of 11 slots gives 42.2. On GDCLD, SegFormer-B0 is best (mIoU 70.1, IoU 40.9; U-Net 38.7) with 3.7 M parameters and 1.75 GFLOPs at 256 px, against 24.4 M and 7.82 for the U-Net; training SegFormer-B0 for 60 epochs did not help on test (40.0).
+Table 3 gives protocol A results (single seed). On Landslide4Sense with all 14 bands the U-Net reaches a landslide IoU of 48.0 and SegFormer-B0 46.7; restricted to RGB they fall to 37.9 and 39.2, and the band adapter on 9 of 11 slots gives 42.2. On GDCLD, SegFormer-B0 is best (mIoU 70.1, IoU 40.9; U-Net 38.7) with 3.7 M parameters and 1.75 GFLOPs at 256 px, against 24.4 M and 7.82 for the U-Net; training SegFormer-B0 for 60 epochs did not help on test (40.0).
 
 | Dataset | Input | Model | Params (M) | GFLOPs | mIoU | IoU | F1 | Prec. | Rec. | PR-AUC | ECE |
 |–-|–-|–-|–-|–-|–-|–-|–-|–-|–-|–-|–-|
@@ -127,7 +143,7 @@ Table 2 gives protocol A results (single seed). On Landslide4Sense with all 14 b
 
 *In-dataset results (protocol A, official test sets, single seed). Landslide4Sense test masks are those shipped in the Zenodo release. All numbers measured by us.*
 
-**Context from the literature (E2).**  Table 3 lists values reported by others. On Landslide4Sense the cited papers report U-Net mIoU/F1 of 70.4/59.7 [17] and 70.44/59.66 [8]; our U-Net reaches 73.3/64.9. We do not read this as an improvement: the inputs (all 14 bands against six bands in [17]), encoder, loss and checkpoint selection differ, and we did not re-run their pipelines.
+**Context from the literature (E2).**  Table 4 lists values reported by others. On Landslide4Sense the cited papers report U-Net mIoU/F1 of 70.4/59.7 [17] and 70.44/59.66 [8]; our U-Net reaches 73.3/64.9. We do not read this as an improvement: the inputs (all 14 bands against six bands in [17]), encoder, loss and checkpoint selection differ, and we did not re-run their pipelines.
 
 For GDCLD our SegFormer-B0 reaches a test mIoU of 70.1. The GDCLD paper reports for SegFormer a mIoU of 85.06 on its *validation* set but 72.84 on its independent *test* set of four events [10]; our figure is −2.7 points from the latter. That paper does not state how mIoU or F1 are averaged over classes. Under the assumption that its F1 is a two-class average, the corresponding quantity for our model, derived from our stored IoU values, is 78.9 against their 81.88 (our landslide-class F1 alone is 58.1); we cannot confirm their averaging, input size or model variant, and our model is smaller, trained for fewer epochs, and evaluated on 256 px downscaled crops. We therefore regard our GDCLD result as broadly consistent with the cited test result; comparing it with the cited *validation* figure would mix splits that differ by 12.22 points in that paper alone.
 
@@ -143,11 +159,11 @@ For GDCLD our SegFormer-B0 reaches a test mIoU of 70.1. The GDCLD paper reports 
 
 *Values reported by other papers, shown as context only (E2). Read through a page-retrieval tool; table images were not inspected, so every value must be checked against the original. Inputs, splits, models and metric definitions differ from ours.*
 
-**Validation overstates test.**  In our GDCLD runs the best validation landslide IoU exceeds the test IoU by 29.2 points (SegFormer-B0; 30.8 for the U-Net). The cited GDCLD paper shows a similar pattern in its own numbers (12.22 mIoU points between validation and test). Both are consistent with validation tiles sharing events with training tiles; we cannot prove this, because GDCLD's training and validation tiles carry no event identifier. The test crops also contain a much smaller share of landslide pixels than the training and validation tiles, which lowers IoU for the same per-pixel error.
+**Validation overstates test.**  In our GDCLD runs the best validation landslide IoU exceeds the test IoU by 29.2 points (SegFormer-B0; 30.8 for the U-Net). The cited GDCLD paper shows a similar pattern in its own numbers (12.22 mIoU points between validation and test). Both are consistent with validation tiles sharing events with training tiles, which is how the dataset paper describes its random 3:1 split within five events, whereas the test images come from four other events [10]; we cannot verify the split ourselves, because GDCLD's training and validation tiles carry no event identifier. The test crops also contain a much smaller share of landslide pixels than the training and validation tiles, which lowers IoU for the same per-pixel error.
 
 ### 6.2 Cross-dataset transfer under B-strict
 
-Table 4 and Figure 2 report landslide IoU on each held-out dataset (mean ± std over 3 seeds). SegFormer-B0 reaches 24.4 ± 2.9 averaged over the five datasets and the U-Net 17.5 ± 2.9. SegFormer-B0 is ahead on 4 of 5 datasets (differences of seed means: HR-GLDD +6.5, GDCLD +10.7, LMHLD +4.3, CAS +17.3; mean +6.9) and behind on Landslide4Sense (−4.4), where both models vary strongly between seeds (std 9.4 and 6.2). The gap on CAS is the largest: the U-Net gets 3.9 ± 2.1 against 21.2 ± 2.1. Seed 0 of SegFormer-B0 reached 24.1 on Landslide4Sense whereas the three-seed mean is 13.4; a single-seed ranking on that fold would have been misleading. Per-seed values are in Appendix Table 10 and further metrics in Appendix Tables 8 and 9. We interpret the difference between the two architectures as suggestive evidence for SegFormer-B0 on average, not as a significant effect.
+Table 5 and Figure 2 report landslide IoU on each held-out dataset (mean ± std over 3 seeds). SegFormer-B0 reaches 24.4 ± 2.9 averaged over the five datasets and the U-Net 17.5 ± 2.9. SegFormer-B0 is ahead on 4 of 5 datasets (differences of seed means: HR-GLDD +6.5, GDCLD +10.7, LMHLD +4.3, CAS +17.3; mean +6.9) and behind on Landslide4Sense (−4.4), where both models vary strongly between seeds (std 9.4 and 6.2). The gap on CAS is the largest: the U-Net gets 3.9 ± 2.1 against 21.2 ± 2.1. Seed 0 of SegFormer-B0 reached 24.1 on Landslide4Sense whereas the three-seed mean is 13.4; a single-seed ranking on that fold would have been misleading. Per-seed values are in Appendix Table 12 and further metrics in Appendix Tables 10 and 11. We interpret the difference between the two architectures as suggestive evidence for SegFormer-B0 on average, not as a significant effect.
 
 | Method | L4S | HR-GLDD | GDCLD | LMHLD | CAS | Mean |
 |–-|–-|–-|–-|–-|–-|–-|
@@ -164,22 +180,40 @@ Table 4 and Figure 2 report landslide IoU on each held-out dataset (mean ± std 
 
 ### 6.3 Effect of event overlap
 
-Plain leave-one-dataset-out (events may overlap) gives SegFormer-B0 a seed-0 IoU of 48.3 on CAS and 45.3 on GDCLD, against 22.1 and 28.6 under B-strict (Table 5, Figure 3). Because B-strict also trains on fewer tiles, we repeated plain B with the training set randomly cut to the B-strict size. On CAS this size-matched run stays at 46.7, so the drop of 24.6 points is attributable to the removal of shared events and only 1.6 points to data volume. On GDCLD the 16.7-point drop splits into 6.4 points for data volume and 10.3 for shared events. On Landslide4Sense and LMHLD the differences between the size-matched and B-strict runs (−1.3 and −3.4) are smaller than the B-strict seed standard deviations (9.4 and 6.2), so these data show no detectable effect, which is not the same as no effect. The plain-B and size-matched runs are single seeds; for CAS and GDCLD the effects are far larger than the B-strict seed standard deviations (2.1 and 0.2), but a multi-seed repeat would be needed to quantify them. The plain-B HR-GLDD fold was made with the wrong channel order and is not reported.
+Protocols B and B-strict differ in three ways at once: the number of training tiles, which source datasets supply them (Table 2), and whether tiles that share events with the held-out dataset are present. We separate these with two SegFormer-B0 controls (Table 6, Figure 3). A *size-matched* control cuts plain B to the B-strict number of tiles, drawn from all four other datasets (seed 0). A *composition-matched* control trains on the same source datasets as B-strict (LMHLD and CAS, excluding the held-out one) and the same number of tiles but does *not* remove event-sharing tiles (3 seeds); it differs from B-strict only in event overlap.
 
-| Held-out | Plain B | Plain B, size-matched | B-strict | Difference attributable to |  |
-|–-|–-|–-|–-|–-|–-|
-|  | (seed 0) | (seed 0) | (seed 0) | training-set size | shared events |
-| L4S | 27.3 | 22.8 | 24.1 | 4.5 | −1.3 |
-| HR-GLDD | n/a | 38.1 | 36.7 | n/a | 1.4 |
-| GDCLD | 45.3 | 38.9 | 28.6 | 6.4 | 10.3 |
-| LMHLD | 24.9 | 19.4 | 22.8 | 5.5 | −3.4 |
-| CAS | 48.3 | 46.7 | 22.1 | 1.6 | 24.6 |
+**Total drop and training-set size.**  Plain B gives (seed 0) 48.3 on CAS and 45.3 on GDCLD against 22.1 and 28.6 under B-strict, drops of 26.2 and 16.7 points; on L4S and LMHLD the drops are 3.2 and 2.1 points. Cutting plain B to the B-strict size accounts for only 1.6 to 6.4 points of these drops.
 
-*Event-overlap control, SegFormer-B0, landslide IoU (%), seed 0. “Difference attributable to” is plain B minus size-matched (training-set size) and size-matched minus B-strict (shared events).*
+**Event overlap with the sources held fixed.**  Between the composition-matched control and B-strict (Table 7), removing event-sharing tiles lowers IoU on GDCLD from 45.3 ± 0.6 to 28.5 ± 0.2 (a difference of 16.8 points, far larger than the seed standard deviations) and on CAS from 27.7 ± 1.7 to 21.2 ± 2.1 (6.5 points, about three times the seed standard deviations). On Landslide4Sense (+1.2) and HR-GLDD (+0.8) the differences are within the seed noise. On LMHLD the composition-matched model scores *lower* than B-strict (−5.8; seed standard deviations 2.9 and 6.2), a reversal of the size of the noise. Averaged over datasets, keeping events gives 28.3 ± 2.3 against 24.4 ± 2.9 (a difference of +3.9, higher with events kept on 4 of 5 datasets), a gain dominated by GDCLD.
+
+**What remains unseparated.**  For CAS most of the plain-B-to-B-strict drop is not the event removal above but the loss of the other source datasets: in seed 0 the composition-matched run is 19.0 points below the size-matched run. Those datasets include data that share events with CAS (for example GDCLD shares Jiuzhaigou, Luding and Hokkaido with it) as well as different sensors and regions, so event overlap and source diversity cannot be separated in that step; the composition-matched comparison isolates only the event overlap *within* the two remaining sources. The plain-B and size-matched runs are single seeds, and the plain-B HR-GLDD fold was made with the wrong channel order and is not reported.
+
+| Held-out | Plain B | Plain B, size-matched | Composition-matched | B-strict |
+|–-|–-|–-|–-|–-|
+|  | (all 4 other datasets) | (all 4 other datasets) | (LMHLD + CAS only) | (LMHLD + CAS only) |
+|  | events kept, seed 0 | events kept, seed 0 | events kept | events removed |
+| L4S | 27.3 | 22.8 | 14.5±7.6 | 13.4±9.4 |
+| HR-GLDD | n/a | 38.1 | 37.7±0.7 | 36.9±0.6 |
+| GDCLD | 45.3 | 38.9 | 45.3±0.6 | 28.5±0.2 |
+| LMHLD | 24.9 | 19.4 | 16.0±2.9 | 21.8±6.2 |
+| CAS | 48.3 | 46.7 | 27.7±1.7 | 21.2±2.1 |
+
+*Event-overlap controls for SegFormer-B0, landslide IoU (%). Plain B and size-matched: seed 0. Composition-matched and B-strict: mean ± sample std over seeds. These two train on the same source datasets (LMHLD and CAS) and the same number of tiles and differ only in whether event-sharing tiles are present.*
+
+| Held-out | Events kept (composition-matched) | Events removed (B-strict) | Difference of means | Seed std (kept / removed) |
+|–-|–-|–-|–-|–-|
+| L4S | 14.5 | 13.4 | +1.2 | 7.6 / 9.4 |
+| HR-GLDD | 37.7 | 36.9 | +0.8 | 0.7 / 0.6 |
+| GDCLD | 45.3 | 28.5 | +16.8 | 0.6 / 0.2 |
+| LMHLD | 16.0 | 21.8 | −5.8 | 2.9 / 6.2 |
+| CAS | 27.7 | 21.2 | +6.5 | 1.7 / 2.1 |
+| Mean over datasets | 28.3 | 24.4 | +3.9 | 2.3 / 2.9 |
+
+*Effect of removing event-sharing tiles with the training sources and size held fixed: difference of seed means (composition-matched minus B-strict; positive means higher with events kept) and the seed standard deviations of the two conditions.*
 
 ![](../figures/fig_overlap.png)
 
-*Event-overlap control for SegFormer-B0 (bars: seed 0; diamonds: B-strict mean ± std over three seeds).*
+*Event-overlap controls for SegFormer-B0. Bars: seed 0; diamonds with error bars: mean ± std over three seeds (composition-matched and B-strict).*
 
 ### 6.4 Band adapter
 
@@ -187,7 +221,7 @@ Under B-strict the band adapter gives 13.0 ± 5.7 (L4S), 39.4 ± 1.7 (HR-GLDD), 
 
 ### 6.5 LoRA teacher and distillation
 
-The SegFormer-B3 teacher (45.7 M parameters; 1.61 M trained) reaches (seed 0) a mean landslide IoU of 30.2 over the five datasets, +3.3 points relative to seed 0 of the RGB SegFormer-B0 (26.9); it is 12.3 times larger and 3.9 times slower on the CPU. The distilled student did not beat the undistilled student (Table 6): its seed-0 five-dataset mean is 22.9 against 26.9, and it was worse on four of five datasets (differences of seed means: L4S −3.7, HR-GLDD −3.1, GDCLD −1.1, CAS −6.1) and better on LMHLD (+8.3, a single seed there). The drops on L4S and CAS reproduced with a second seed (L4S 9.6 ± 0.8, CAS 15.1 ± 2.8), so they are not one-off failures, although the undistilled L4S baseline is itself very noisy (13.4 ± 9.4). This is a negative result for this configuration: we did not tune α, T or the LoRA rank, tried one teacher, and did not run rank or distillation-type ablations.
+The SegFormer-B3 teacher (45.7 M parameters; 1.61 M trained) reaches (seed 0) a mean landslide IoU of 30.2 over the five datasets, +3.3 points relative to seed 0 of the RGB SegFormer-B0 (26.9); it is 12.3 times larger and 3.9 times slower on the CPU. The distilled student did not beat the undistilled student (Table 8): its seed-0 five-dataset mean is 22.9 against 26.9, and it was worse on four of five datasets (differences of seed means: L4S −3.7, HR-GLDD −3.1, GDCLD −1.1, CAS −6.1) and better on LMHLD (+8.3, a single seed there). The drops on L4S and CAS reproduced with a second seed (L4S 9.6 ± 0.8, CAS 15.1 ± 2.8), so they are not one-off failures, although the undistilled L4S baseline is itself very noisy (13.4 ± 9.4). This is a negative result for this configuration: we did not tune α, T or the LoRA rank, tried one teacher, and did not run rank or distillation-type ablations.
 
 | Held-out | Teacher B3+LoRA (seed 0) | Student, KD | Student, no KD (seed 0) | Student, no KD (mean of seeds) |
 |–-|–-|–-|–-|–-|
@@ -202,7 +236,7 @@ The SegFormer-B3 teacher (45.7 M parameters; 1.61 M trained) reaches (seed 0) a 
 
 ### 6.6 Efficiency
 
-Table 7 and Figure 4 give parameters, GFLOPs and CPU latency. At 128 px SegFormer-B0 takes 22 ms with four threads (3.7 M parameters, 0.42 GFLOPs, 15 MB of fp32 weights) against 45 ms for the U-Net (24.4 M, 1.96 GFLOPs), a factor of 2.0, and is on average more accurate under B-strict. Median training time per B-strict fold was 382 s for SegFormer-B0 and 496 s for the U-Net on a T4 (a distilled-student fold took 839 s plus 1329 s for the teacher). Single-thread timings are noisier. On the accuracy axis of Figure 4, the adapter and the distilled student sit at the same latency as SegFormer-B0 without an accuracy gain.
+Table 9 and Figure 4 give parameters, GFLOPs and CPU latency. At 128 px SegFormer-B0 takes 22 ms with four threads (3.7 M parameters, 0.42 GFLOPs, 15 MB of fp32 weights) against 45 ms for the U-Net (24.4 M, 1.96 GFLOPs), a factor of 2.0, and is on average more accurate under B-strict. Median training time per B-strict fold was 382 s for SegFormer-B0 and 496 s for the U-Net on a T4 (a distilled-student fold took 839 s plus 1329 s for the teacher). Single-thread timings are noisier. On the accuracy axis of Figure 4, the adapter and the distilled student sit at the same latency as SegFormer-B0 without an accuracy gain.
 
 | Model | Params (M) | Weights fp32 (MB) | GFLOPs, 128 px | 128 px, 1 thread (ms) | 128 px, 4 threads (ms) | 256 px, 4 threads (ms) |
 |–-|–-|–-|–-|–-|–-|–-|
@@ -220,7 +254,7 @@ Table 7 and Figure 4 give parameters, GFLOPs and CPU latency. At 128 px SegForme
 
 ### 6.7 Calibration
 
-Pixel-level ECE is low in-dataset (0.010 for the L4S U-Net; 0.004 for the GDCLD SegFormer-B0) but higher on unseen datasets: five-dataset means are 0.055 ± 0.006 for SegFormer-B0 and 0.087 ± 0.003 for the U-Net, with the largest values on CAS (0.108 ± 0.005 and 0.142 ± 0.003) and, for the U-Net, on LMHLD (0.168 ± 0.008). Reliability curves (Figure 5) lie below the diagonal for every method: confident predictions are right less often than their confidence implies. The U-Net's confident predictions on LMHLD and CAS are barely better than chance. ECE is computed over all pixels and is dominated by background, which limits its meaning for rare-class segmentation.
+Pixel-level ECE is low in-dataset (0.010 for the L4S U-Net; 0.004 for the GDCLD SegFormer-B0) but higher on unseen datasets: five-dataset means are 0.055 ± 0.006 for SegFormer-B0 and 0.087 ± 0.003 for the U-Net, with the largest values on CAS (0.108 ± 0.005 and 0.142 ± 0.003) and, for the U-Net, on LMHLD (0.168 ± 0.008). Reliability curves (Figure 5) lie below the diagonal in almost all panels, so confident predictions are usually right less often than their confidence implies; the exception in the plotted seed is the U-Net on HR-GLDD at mid confidence, where it is under-confident. In the plotted seed the U-Net's confident predictions on LMHLD and CAS are barely better than chance. ECE is computed over all pixels and is dominated by background, which limits its meaning for rare-class segmentation.
 
 ![](../figures/fig_reliability.png)
 
@@ -228,7 +262,7 @@ Pixel-level ECE is low in-dataset (0.010 for the L4S U-Net; 0.004 for the GDCLD 
 
 ### 6.8 Failure analysis
 
-Failures are local rather than uniform (Appendix Table 11; size-matched SegFormer-B0 runs, seed 0): on CAS, Palu reaches 1.9 and Lombok 9.6 against 55.5 for Jiuzhai valley; on GDCLD, Mesetas 2.2 and Lushan 13.2 against 31.8 for Palu; on LMHLD, Wenchuan (IKONOS, 0.8 m) 4.5 against 19.1 to 32.7 for the other six events. Figure 6 shows the two typical outcomes on held-out CAS (adapter model, seed 1): tiles whose landslides cover 1.0 to 5.2% of the area and are missed entirely (IoU 0.00), and near-whole-tile landslides in 0.2 m UAV imagery of Jiuzhai valley that are easy (IoU 0.93 to 0.98). Many tiles tie at IoU 0.00 and our export breaks ties by tile index, so the six “worst” tiles all come from one region (Hokkaido Iburi-Tobu, a 3 m satellite subset); they illustrate a failure mode and are not a ranking of the worst cases.
+Failures are local rather than uniform (Appendix Table 13; size-matched SegFormer-B0 runs, seed 0): on CAS, Palu reaches 1.9 and Lombok 9.6 against 55.5 for Jiuzhai valley; on GDCLD, Mesetas 2.2 and Lushan 13.2 against 31.8 for Palu; on LMHLD, Wenchuan (IKONOS, 0.8 m) 4.5 against 19.1 to 32.7 for the other six events. Figure 6 shows the two typical outcomes on held-out CAS (adapter model, seed 1): tiles whose landslides cover 1.0 to 5.2% of the area and are missed entirely (IoU 0.00), and near-whole-tile landslides in 0.2 m UAV imagery of Jiuzhai valley that are easy (IoU 0.93 to 0.98). Many tiles tie at IoU 0.00 and our export breaks ties by tile index, so the six “worst” tiles all come from one region (Hokkaido Iburi-Tobu, a 3 m satellite subset); they illustrate a failure mode and are not a ranking of the worst cases.
 
 ![](../figures/fig_failures.png)
 
@@ -236,9 +270,9 @@ Failures are local rather than uniform (Appendix Table 11; size-matched SegForme
 
 ## 7. Discussion
 
-**What the evidence supports.**  (1) Scores obtained without removing shared events can substantially overstate cross-dataset performance on some datasets: the effect is large for CAS and GDCLD in our single-seed control and not detectable on the other three. (2) Under event-isolated transfer a compact SegFormer-B0 is, on average over datasets and seeds, at least as accurate as a ResNet34 U-Net with several times more parameters, at half the CPU latency, although the ranking varies by dataset and the difference is not shown to be significant. (3) Neither the band adapter nor distillation from a larger LoRA teacher improved the compact model in our configuration. (4) All models were over-confident on unseen datasets. (5) A single misdocumented channel order can change a transfer result by an order of magnitude, and several dataset documents are inconsistent with the files.
+**What the evidence supports.**  (1) Scores obtained without removing event-sharing training data can substantially overstate cross-dataset performance on some datasets: with the training sources and size held fixed, the effect is large for GDCLD, moderate for CAS and not detectable for the other three (three seeds); beyond that, the larger source pool of plain B contributes its own, partly inseparable, benefit. (2) Under event-isolated transfer a compact SegFormer-B0 is, on average over datasets and seeds, at least as accurate as a ResNet34 U-Net with several times more parameters, at half the CPU latency, although the ranking varies by dataset and the difference is not shown to be significant. (3) Neither the band adapter nor distillation from a larger LoRA teacher improved the compact model in our configuration. (4) With few exceptions, models were over-confident on unseen datasets. (5) A single misdocumented channel order can change a transfer result by an order of magnitude, and several dataset documents are inconsistent with the files.
 
-**What it does not support.**  We did not show that SegFormer-style models are intrinsically better at transfer: one family was tried, with short training, RGB input and no tuning. We did not show that distillation or band adaptation cannot work: we tested one configuration each. We cannot attribute the validation–test gap on GDCLD to event overlap, because event identifiers are missing for its training and validation tiles. Event overlap is quantified only for single-seed controls, and event membership is partly inferred.
+**What it does not support.**  We did not show that SegFormer-style models are intrinsically better at transfer: one family was tried, with short training, RGB input and no tuning. We did not show that distillation or band adaptation cannot work: we tested one configuration each. We cannot attribute the validation–test gap on GDCLD to event overlap, because event identifiers are missing for its training and validation tiles. The effect of event overlap is isolated only within the two source datasets that remain under B-strict; for datasets removed wholesale, event overlap and source diversity are confounded. Event membership is partly inferred.
 
 **Implications for benchmark design (recommendations, E4).**  Report which physical events a test set shares with the training data; prefer a held-out dataset or event over a held-out tile; report several seeds, since a single seed misranked methods on one fold in our data; report calibration and latency, not only overlap metrics; and publish tile-level event or region identifiers with datasets so that isolation can be checked. Event identifiers were available only for two of the five datasets.
 
@@ -246,13 +280,15 @@ Failures are local rather than uniform (Appendix Table 11; size-matched SegForme
 
 ## 8. Limitations
 
-- **Seeds and statistics.** The headline B-strict comparisons use 3 seeds; the teacher, the distilled student, the event-overlap control, per-region analysis and in-dataset baselines are single- or two-seed. Seed variation is large on some folds, and five folds do not allow a significance test at the 5% level.
+- **Seeds and statistics.** The headline B-strict comparisons use 3 seeds; the teacher, the distilled student, the plain-B and size-matched controls, the per-region analysis and the in-dataset baselines are single- or two-seed. Seed variation is large on some folds, and five folds do not allow a significance test at the 5% level.
+
+- **Untuned architecture comparison.** Learning rate and weight decay differ between the SegFormer and CNN families (Table 15) and were not tuned for any model, so the U-Net/SegFormer comparison is a comparison of untuned defaults and could change with tuning.
 
 - **Scope of models and inputs.** One compact transformer and two CNNs, RGB (or the adapter's bands), 128 px crops and 10 epochs; no foundation models (excluded by the compute budget), no longer training, no tuning. GDCLD was downscaled by 4 and CAS by about 2 (from the 512 px tiles we inspected), losing detail visible at 0.2 to 1 m resolution in the UAV subsets.
 
 - **Protocol.** Event assignments are partly inferred from place names, so residual overlap cannot be excluded; L4S, HR-GLDD and the GDCLD training and validation tiles carry no event identifiers, so those datasets can only be held out whole; protocol C was not run.
 
-- **Data.** The HR-GLDD band order and the fifth LMHLD Rio channel are inferred. CAS has no negative tiles, so false-alarm statistics are unavailable. LMHLD and GDCLD protocol-A splits are not event-isolated.
+- **Data.** The HR-GLDD band order and the fifth LMHLD Rio channel are inferred. CAS has no negative tiles, so false-alarm statistics are unavailable. The LMHLD protocol-A split and the GDCLD validation split are not event-isolated.
 
 - **Metrics.** ECE is pixel-level and dominated by background; PR-AUC is a histogram estimate; F1 is for the landslide class.
 
@@ -266,7 +302,7 @@ Failures are local rather than uniform (Appendix Table 11; size-matched SegForme
 
 ## 9. Conclusions
 
-Under an event-isolated leave-one-dataset-out protocol over five public datasets, a compact SegFormer-B0 transferred, on average, at least as well as a larger U-Net at half the CPU latency, but absolute transfer accuracy was low (mean landslide IoU 24.4), models were over-confident, and neither a band adapter nor distillation from a LoRA teacher helped. Removing shared events lowered scores markedly on two datasets in a single-seed control. The main practical message is methodological: report event overlap, use several seeds, and check the documentation of channel order and splits before drawing conclusions. We release the code, splits, leakage report and per-run results so that these checks can be repeated.
+Under an event-isolated leave-one-dataset-out protocol over five public datasets, a compact SegFormer-B0 transferred, on average, at least as well as a larger U-Net at half the CPU latency, but absolute transfer accuracy was low (mean landslide IoU 24.4), models were generally over-confident, and neither a band adapter nor distillation from a LoRA teacher helped. With the training sources held fixed, removing event-sharing tiles lowered scores clearly on GDCLD and moderately on CAS, and not detectably on the other three datasets. The main practical message is methodological: report event overlap, use several seeds, and check the documentation of channel order and splits before drawing conclusions. We release the code, splits, leakage report and per-run results so that these checks can be repeated.
 
 ## Data and code availability
 
@@ -274,7 +310,17 @@ Code, splits, the leakage report, per-run result files, tables and figures are i
 
 ## Declarations
 
-**[TO DO: Funding, competing interests, author contributions (CRediT), acknowledgements and ethics statements to be completed by the authors.]** **[TO DO: AI-assistance disclosure to be confirmed by the authors per the target journal's policy: the analysis code, the figures and the manuscript draft were prepared with the assistance of a generative AI system (Claude, Anthropic); all numbers are generated from stored run files, and the authors remain responsible for the content.]** Compute: free-tier GPU sessions (Tesla T4) on Kaggle and one laptop CPU.
+**Funding.**  **[TO DO: To be completed by the authors.]**
+
+**Competing interests.**  **[TO DO: To be completed by the authors.]**
+
+**Author contributions (CRediT).**  **[TO DO: To be completed by the authors.]**
+
+**Ethics.**  **[TO DO: To be confirmed by the authors. The study uses only public third-party datasets under their licences and no human or animal subjects, as far as we are aware.]**
+
+**Acknowledgements.**  **[TO DO: To be completed by the authors.]** Compute: free-tier GPU sessions (Tesla T4) on Kaggle and one laptop CPU.
+
+**Use of AI tools.**  **[TO DO: To be confirmed by the authors against the target journal's policy.]** The analysis code, the figures and the manuscript draft were prepared with the assistance of a generative AI system (Claude, Anthropic). All numbers in the text and tables are generated from stored run files by scripts included in the repository, and the authors remain responsible for the content.
 
 ## References
 
@@ -415,7 +461,7 @@ Code, splits, the leakage report, per-run result files, tables and figures are i
 
 ## D. HR-GLDD channel statistics
 
-Table 14 gives mean channel values of the HR-GLDD arrays and of LMHLD scenes whose order is documented as B,G,R,NIR. For HR-GLDD the ordering of the first three channel means (channel 1 < channel 3 < channel 2) is the one that B,G,R would give in one PlanetScope scene (Hokkaido: B < R < G) but not in the other (Taiwan: B < G < R), and values are on different scales (reflectance fractions against digital numbers). The statistics are therefore weak evidence. The decisive evidence is the transfer result in Section 3.4, which supports the B,G,R,NIR mapping only in the sense that it works much better than R,G,B,NIR; we did not test other permutations.
+Table 16 gives mean channel values of the HR-GLDD arrays and of LMHLD scenes whose order is documented as B,G,R,NIR. For HR-GLDD the ordering of the first three channel means (channel 1 < channel 3 < channel 2) is the one that B,G,R would give in one PlanetScope scene (Hokkaido: B < R < G) but not in the other (Taiwan: B < G < R), and values are on different scales (reflectance fractions against digital numbers). The statistics are therefore weak evidence. The decisive evidence is the transfer result in Section 3.4, which supports the B,G,R,NIR mapping only in the sense that it works much better than R,G,B,NIR; we did not test other permutations.
 
 | Scene | Sensor | ch.\ 1 | ch.\ 2 | ch.\ 3 | NIR | Order of first three channels |
 |–-|–-|–-|–-|–-|–-|–-|
@@ -431,5 +477,5 @@ Table 14 gives mean channel values of the HR-GLDD arrays and of LMHLD scenes who
 
 ## E. Provenance
 
-All results in this paper are generated from 71 stored run files by `scripts/make_paper_assets.py` (numbers, tables, bibliography), `scripts/make_figures.py`, `scripts/make_figures_paper.py` and `scripts/make_fig_data.py` (figures); the table of every macro and its value is `paper/generated/numbers_provenance.json`. Runs made with the wrong HR-GLDD channel order were excluded and are kept separately.
+All results in this paper are generated from 86 stored run files by scripts/make_paper_assets.py (numbers, tables, bibliography), scripts/make_figures.py, scripts/make_figures_paper.py and scripts/make_fig_data.py (figures); the table of every macro and its value is paper/generated/numbers_provenance.json. Runs made with the wrong HR-GLDD channel order were excluded and are kept separately.
 

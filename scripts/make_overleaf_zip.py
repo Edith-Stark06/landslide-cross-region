@@ -1,4 +1,4 @@
-"""Package the manuscript as a self-contained Overleaf project (zip).
+﻿"""Package the manuscript as a self-contained Overleaf project (zip).
 
 Layout inside the zip:
   main.tex                 the manuscript (paths rewritten to figures/ and generated/, inputenc+fontenc added for pdfLaTeX)
@@ -37,7 +37,7 @@ HOW TO COMPILE
 1. Overleaf -> New Project -> Upload Project -> choose this zip.
 2. Menu -> Main document: main.tex ; Compiler: pdfLaTeX (default) ; TeX Live: any recent version.
 3. Recompile. The preamble uses only standard packages: article, inputenc, fontenc, amsmath, amssymb, graphicx, booktabs, multirow,
-   array, xcolor, url, cite. The bibliography is a hand-built thebibliography (generated/refs.tex), so no BibTeX run is needed.
+   array, xcolor, url, cite, float. The bibliography is a hand-built thebibliography (generated/refs.tex), so no BibTeX run is needed.
 4. This package was NOT compiled on the machine that produced it (no LaTeX installation there). It passed static checks (balanced
    environments, table column counts, undefined macros, citations and labels). If Overleaf shows an error, copy the first error
    message from the log and send it back.
@@ -80,3 +80,4 @@ with zipfile.ZipFile(OUT) as z:
     print(f"{OUT.name}: {len(names)} files, {OUT.stat().st_size / 1e6:.2f} MB")
     for n in names:
         print("  ", n, f"{z.getinfo(n).file_size / 1e3:.0f} kB")
+

@@ -18,16 +18,14 @@ bad = 0
 
 
 def spec_cols(spec: str) -> int:
-    spec = re.sub(r"@\{[^}]*\}|\|", "", spec)
-    n = 0
-    for tok in re.findall(r"[lcrXpmb](?:\{[^}]*\})?", spec):
-        n += 1
-    return n
+    brace = r"\{(?:[^{}]|\{[^{}]*\})*\}"
+    spec = re.sub(r"@" + brace + r"|>" + brace + r"|<" + brace + r"|\|", "", spec)      # @{..}, >{..}, <{..}, rules
+    return len(re.findall(r"[lcrXpmb](?:" + brace + r")?", spec))                      # p{..}/m{..}/b{..} count once
 
 
 for f in sorted((P / "generated").glob("tab_*.tex")):
     txt = f.read_text(encoding="utf-8")
-    m = re.search(r"\\begin\{tabular\}\{([^}]*)\}", txt)
+    m = re.search(r"\\begin\{tabular\}\{((?:[^{}]|\{(?:[^{}]|\{[^{}]*\})*\})*)\}", txt)
     ncol = spec_cols(m.group(1))
     for line in txt.splitlines():
         s = line.strip()

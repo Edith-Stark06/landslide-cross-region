@@ -501,7 +501,7 @@ t += ["\\bottomrule", "\\end{tabular}"]
 write("tab_channels.tex", "\n".join(t) + "\n")
 
 # per-region
-t = ["\\begin{tabular}{ll}", "\\toprule", "Held-out dataset & Landslide IoU by region/event (ascending) \\\\", "\\midrule"]
+t = ["\\begin{tabular}{l>{\\raggedright\\arraybackslash}p{0.80\\textwidth}}", "\\toprule", "Held-out dataset & Landslide IoU by region/event (ascending) \\\\", "\\midrule"]
 for ds in ("cas", "gdcld", "lmhld"):
     if ds in REG:
         items = ", ".join(f"{esc(g.replace('_', ' '))} {v:.1f}" for g, v in sorted(REG[ds].items(), key=lambda kv: kv[1]))
