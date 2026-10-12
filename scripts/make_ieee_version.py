@@ -30,7 +30,8 @@ src = (P / "manuscript.tex").read_text(encoding="utf-8-sig")
 
 # Tables that fit one column at \footnotesize (natural width <= 1.15 x column width, measured with IEEEtran [journal]:
 # column 252 pt, page 516 pt; composition 282 pt, perseed 267 pt, events 249 pt). All other tables span both columns.
-SINGLE_COLUMN_TABLES = {"tab_composition", "tab_perseed", "tab_events"}
+# tab_regions is wide only because of its long text column (p{0.80\textwidth}); it is set at column width with the text wrapped.
+SINGLE_COLUMN_TABLES = {"tab_composition", "tab_perseed", "tab_events", "tab_regions"}
 
 # ---------------------------------------------------------------------------------------------------------------- split
 pre, rest = src.split("\\begin{document}", 1)
@@ -68,8 +69,10 @@ def tab_block(m):
     caption = m.group("caption")
     env = "table" if name in SINGLE_COLUMN_TABLES else "table*"
     w = "\\columnwidth" if env == "table" else "\\textwidth"
-    return (f"\\begin{{{env}}}[!t]\\centering\n{caption}\n\\footnotesize\n"
-            f"\\fitbox{{{w}}}{{\\input{{generated/{name}.tex}}}}\n\\end{{{env}}}")
+    box = f"\\fitbox{{{w}}}{{\\input{{generated/{name}.tex}}}}"
+    if name == "tab_regions":                                           # its column is defined as a fraction of \textwidth
+        box = "{\\setlength{\\textwidth}{\\columnwidth}" + box + "}"
+    return f"\\begin{{{env}}}[!t]\\centering\n{caption}\n\\footnotesize\n{box}\n\\end{{{env}}}"
 
 
 FIG = re.compile(r"\\begin\{figure\}\[t\]\\centering\n\\includegraphics\[width=(?P<w>[^\]]*)\]\{(?P<p>[^}]*)\}\n(?P<tail>\\caption.*\n)\\end\{figure\}")
@@ -232,6 +235,10 @@ common_pkgs = r"""\usepackage[T1]{fontenc}
 \usepackage{booktabs,multirow,array,xcolor,url,placeins}
 \urlstyle{tt}
 \emergencystretch=2em
+% let several wide floats share a page and let text and floats fill the pages (the defaults leave large gaps)
+\setcounter{topnumber}{4}\setcounter{bottomnumber}{3}\setcounter{totalnumber}{8}\setcounter{dbltopnumber}{6}
+\renewcommand{\topfraction}{0.9}\renewcommand{\bottomfraction}{0.8}\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.7}\renewcommand{\dbltopfraction}{0.9}\renewcommand{\dblfloatpagefraction}{0.7}
 \renewcommand{\arraystretch}{1.08}
 \newsavebox{\fitboxbin}
 % typeset a table at its natural width, scaled down only if it is wider than #1
@@ -243,7 +250,6 @@ tail = f"""
 \\appendices
 {app_t.strip()}
 
-\\FloatBarrier
 {decl_t.strip()}
 
 \\input{{generated/refs_ieee.tex}}

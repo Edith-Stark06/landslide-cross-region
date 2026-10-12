@@ -8,6 +8,10 @@
 \usepackage{booktabs,multirow,array,xcolor,url,placeins}
 \urlstyle{tt}
 \emergencystretch=2em
+% let several wide floats share a page and let text and floats fill the pages (the defaults leave large gaps)
+\setcounter{topnumber}{4}\setcounter{bottomnumber}{3}\setcounter{totalnumber}{8}\setcounter{dbltopnumber}{6}
+\renewcommand{\topfraction}{0.9}\renewcommand{\bottomfraction}{0.8}\renewcommand{\textfraction}{0.1}
+\renewcommand{\floatpagefraction}{0.7}\renewcommand{\dbltopfraction}{0.9}\renewcommand{\dblfloatpagefraction}{0.7}
 \renewcommand{\arraystretch}{1.08}
 \newsavebox{\fitboxbin}
 % typeset a table at its natural width, scaled down only if it is wider than #1
@@ -266,11 +270,11 @@ Under an event-isolated leave-one-dataset-out protocol over five public datasets
 \footnotesize
 \fitbox{\columnwidth}{\input{generated/tab_perseed.tex}}
 \end{table}
-\begin{table*}[!t]\centering
+\begin{table}[!t]\centering
 \caption{Per-region or per-event landslide \iou{} (\%) for SegFormer-B0 under size-matched plain B (seed 0), ascending.}\label{tab:regions}
 \footnotesize
-\fitbox{\textwidth}{\input{generated/tab_regions.tex}}
-\end{table*}
+{\setlength{\textwidth}{\columnwidth}\fitbox{\columnwidth}{\input{generated/tab_regions.tex}}}
+\end{table}
 
 \section{Event assignment}\label{app:events}
 \begin{table}[!t]\centering
@@ -297,7 +301,6 @@ Table~\ref{tab:channels} gives mean channel values of the HR-GLDD arrays and of 
 \section{Provenance}
 All results in this paper are generated from \NumRunsTotal{} stored run files by \url{scripts/make_paper_assets.py} (numbers, tables, bibliography), \url{scripts/make_figures.py}, \url{scripts/make_figures_paper.py} and \url{scripts/make_fig_data.py} (figures); the table of every macro and its value is \url{paper/generated/numbers_provenance.json}. Runs made with the wrong HR-GLDD channel order were excluded and are kept separately.
 
-\FloatBarrier
 \section*{Data and code availability}
 Code, splits, the leakage report, per-run result files, tables and figures are in a public repository (\url{https://github.com/Edith-Stark06/landslide-cross-region}). The datasets are available from their original sources and are not redistributed (Landslide4Sense, HR-GLDD, GDCLD, LMHLD and CAS Landslide are on Zenodo: \url{10.5281/zenodo.10463239}, \url{7189381}, \url{13612636}, \url{17258777}, \url{10294997}); CAS is licensed CC BY-NC 4.0, the others CC BY 4.0 according to their Zenodo records. Trained model weights were not saved or released.
 
