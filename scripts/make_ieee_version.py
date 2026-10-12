@@ -239,6 +239,11 @@ common_pkgs = r"""\usepackage[T1]{fontenc}
 \setcounter{topnumber}{4}\setcounter{bottomnumber}{3}\setcounter{totalnumber}{8}\setcounter{dbltopnumber}{6}
 \renewcommand{\topfraction}{0.9}\renewcommand{\bottomfraction}{0.8}\renewcommand{\textfraction}{0.1}
 \renewcommand{\floatpagefraction}{0.7}\renewcommand{\dbltopfraction}{0.9}\renewcommand{\dblfloatpagefraction}{0.7}
+% on float-only pages stack the floats from the top with a fixed gap instead of spreading them over the page
+\makeatletter
+\setlength{\@fptop}{0pt}\setlength{\@fpsep}{12pt}\setlength{\@fpbot}{0pt plus 1fil}
+\setlength{\@dblfptop}{0pt}\setlength{\@dblfpsep}{12pt}\setlength{\@dblfpbot}{0pt plus 1fil}
+\makeatother
 \renewcommand{\arraystretch}{1.08}
 \newsavebox{\fitboxbin}
 % typeset a table at its natural width, scaled down only if it is wider than #1
@@ -252,6 +257,7 @@ tail = f"""
 
 {decl_t.strip()}
 
+\\FloatBarrier
 \\input{{generated/refs_ieee.tex}}
 
 \\end{{document}}

@@ -14,6 +14,11 @@
 \setcounter{topnumber}{4}\setcounter{bottomnumber}{3}\setcounter{totalnumber}{8}\setcounter{dbltopnumber}{6}
 \renewcommand{\topfraction}{0.9}\renewcommand{\bottomfraction}{0.8}\renewcommand{\textfraction}{0.1}
 \renewcommand{\floatpagefraction}{0.7}\renewcommand{\dbltopfraction}{0.9}\renewcommand{\dblfloatpagefraction}{0.7}
+% on float-only pages stack the floats from the top with a fixed gap instead of spreading them over the page
+\makeatletter
+\setlength{\@fptop}{0pt}\setlength{\@fpsep}{12pt}\setlength{\@fpbot}{0pt plus 1fil}
+\setlength{\@dblfptop}{0pt}\setlength{\@dblfpsep}{12pt}\setlength{\@dblfpbot}{0pt plus 1fil}
+\makeatother
 \renewcommand{\arraystretch}{1.08}
 \newsavebox{\fitboxbin}
 % typeset a table at its natural width, scaled down only if it is wider than #1
@@ -309,6 +314,7 @@ Code, splits, the leakage report, per-run result files, tables and figures are i
 \paragraph{Acknowledgements.} \todo{To be completed by the authors.} Compute: free-tier GPU sessions (Tesla T4) on Kaggle and one laptop CPU.
 \paragraph{Use of AI tools.} \todo{To be confirmed by the authors against the target journal's policy.} The analysis code, the figures and the manuscript draft were prepared with the assistance of a generative AI system (Claude, Anthropic). All numbers in the text and tables are generated from stored run files by scripts included in the repository, and the authors remain responsible for the content.
 
+\FloatBarrier
 \input{generated/refs_ieee.tex}
 
 \end{document}
