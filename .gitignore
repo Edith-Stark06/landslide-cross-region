@@ -9,3 +9,7 @@ data/
 
 
 paper/*.zip
+paper/*.log
+paper/*.aux
+paper/*.out
+paper/*.pdf
