@@ -1,4 +1,4 @@
-﻿"""Package the manuscript as a self-contained Overleaf project (zip).
+"""Package the manuscript as a self-contained Overleaf project (zip).
 
 Layout inside the zip:
   main.tex                 the manuscript (paths rewritten to figures/ and generated/, inputenc+fontenc added for pdfLaTeX)
@@ -18,7 +18,7 @@ sys.stdout.reconfigure(encoding="utf-8")
 ROOT = Path(__file__).resolve().parents[1]
 P = ROOT / "paper"
 OUT = P / "landslide_manuscript_overleaf.zip"
-tex = (P / "manuscript.tex").read_text(encoding="utf-8")
+tex = (P / "manuscript.tex").read_text(encoding="utf-8").lstrip("\ufeff")   # never ship a byte-order mark
 
 tex = tex.replace("../figures/", "figures/")
 tex = tex.replace("% Compile (offline, from this directory): tectonic -X compile --only-cached manuscript.tex",
