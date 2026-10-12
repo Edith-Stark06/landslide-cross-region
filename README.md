@@ -47,6 +47,18 @@ metrics (with per-event breakdowns where events are known). Superseded runs made
 | Readable preview without LaTeX | `$PY -I scripts/make_preview.py` -> `paper/manuscript_preview.md` |
 | Build the PDF | `cd paper && tectonic manuscript.tex` (or upload `paper/` to Overleaf). The class and package files must be available to your LaTeX installation; the preamble uses only `article`, `amsmath`, `amssymb`, `graphicx`, `booktabs`, `multirow`, `array`, `xcolor`, `url` and `cite`. |
 
+**IEEE two-column version (format only).** `paper/manuscript_ieeetran.tex` (class IEEEtran `[journal]`, compiled locally with pdfLaTeX) and
+`paper/manuscript_ieeeaccess.tex` (class `ieeeaccess`, supplied by IEEE with its template; not compiled here) are generated from
+`paper/manuscript.tex`; do not edit them by hand. The wording, numbers, tables and figures are unchanged.
+
+| Step | Command |
+|---|---|
+| Generate the IEEE versions and the IEEE-style reference list (`paper/generated/refs_ieee.tex`) | `$PY -I scripts/make_ieee_version.py` |
+| Check that only the layout changed (captions, tables, figures, sections, abstract, prose lines) | `$PY -I scripts/check_ieee_equivalence.py` |
+| Overleaf zip (`main.tex` = IEEEtran version, `main_ieeeaccess.tex`) | `$PY -I scripts/make_overleaf_zip_ieee.py` -> `paper/landslide_manuscript_ieee_overleaf.zip` |
+
+The IEEE Access template PDF itself (`paper/IEEE Access Template.pdf`) is not tracked by git.
+
 Numbers quoted from other papers are kept in `paper/literature_values.json` with their provenance; reference verification status is in `paper/references.json`.
 `paper/REVIEWER_NOTES.md` is a candid self-review.
 
