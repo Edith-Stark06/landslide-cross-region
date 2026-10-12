@@ -19,6 +19,7 @@ Run: python -I scripts/make_ieee_version.py
 """
 import difflib
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -72,7 +73,12 @@ def tab_block(m):
     box = f"\\fitbox{{{w}}}{{\\input{{generated/{name}.tex}}}}"
     if name == "tab_regions":                                           # its column is defined as a fraction of \textwidth
         box = "{\\setlength{\\textwidth}{\\columnwidth}" + box + "}"
-    return f"\\begin{{{env}}}[!t]\\centering\n{caption}\n\\footnotesize\n{box}\n\\end{{{env}}}"
+    size, spec, stretch = "footnotesize", "!t", ""
+    if IN_APPENDIX:
+        size = os.environ.get("LAYOUT_APP_SIZE", APP_SIZE)
+        spec = os.environ.get("LAYOUT_APP_SPEC", APP_SPEC) if env == "table" else "!t"
+        stretch = "\\renewcommand{\\arraystretch}{" + os.environ.get("LAYOUT_STRETCH", APP_STRETCH) + "}"
+    return f"\\begin{{{env}}}[{spec}]\\centering\n{caption}\n\\{size}{stretch}\n{box}\n\\end{{{env}}}"
 
 
 FIG = re.compile(r"\\begin\{figure\}\[t\]\\centering\n\\includegraphics\[width=(?P<w>[^\]]*)\]\{(?P<p>[^}]*)\}\n(?P<tail>\\caption.*\n)\\end\{figure\}")
@@ -84,7 +90,14 @@ def to_url(m):
     return "\\url{" + t + "}"
 
 
-def transform(text):
+IN_APPENDIX = False
+# Appendix table font, row spacing and placement of one-column tables. Tuned (scripts/measure_page_gaps.py) so that no page has blank space.
+APP_SIZE, APP_SPEC, APP_STRETCH = "footnotesize", "!tb", "1.5"
+
+
+def transform(text, appendix=False):
+    global IN_APPENDIX
+    IN_APPENDIX = appendix
     text = FIG.sub(fig_block, text)
     text = TAB.sub(tab_block, text)
     text = re.sub(r"\bFigures~", "Figs.~", text)
@@ -97,7 +110,25 @@ def transform(text):
     return "\n".join(out)
 
 
-main_t, decl_t, app_t = transform(main_part), transform(decl_part), transform(app_part)
+main_t, decl_t, app_t = transform(main_part), transform(decl_part), transform(app_part, appendix=True)
+
+
+def reorder_appendix_a(text, order):
+    """Permute the table floats of Appendix A (they are floats, so this only changes where they are defined and hence numbered)."""
+    blocks = list(re.finditer(r"\\begin\{(table\*?)\}\[[^\]]*\]\\centering\n.*?\\end\{\1\}", text, re.S))
+    by_name = {re.search(r"generated/(tab_\w+)\.tex", m.group(0)).group(1): m for m in blocks}
+    names = [n for n in by_name if n in order]
+    first, last = by_name[names[0]].start(), max(by_name[n].end() for n in names)
+    assert all(first <= by_name[n].start() < last for n in names)
+    between = text[first:last]
+    for n in names:                                                                  # blocks must be contiguous apart from blank lines
+        between = between.replace(by_name[n].group(0), "")
+    assert not between.strip(), "unexpected text between the Appendix A tables"
+    return text[:first] + "\n".join(by_name[n].group(0) for n in order if n in by_name) + text[last:]
+
+
+ORDER_A = os.environ.get("LAYOUT_ORDER", "tab_regions,tab_strict_f1,tab_strict_ece,tab_perseed").split(",")
+app_t = reorder_appendix_a(app_t, ORDER_A)
 
 # audit: prose lines (outside floats) that differ from the source
 orig_lines = [l for l in (main_part + decl_part + app_part).splitlines()]

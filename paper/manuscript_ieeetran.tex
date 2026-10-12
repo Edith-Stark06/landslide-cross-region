@@ -257,38 +257,38 @@ Under an event-isolated leave-one-dataset-out protocol over five public datasets
 
 \appendices
 \section{Additional results}
+\begin{table}[!tb]\centering
+\caption{Per-region or per-event landslide \iou{} (\%) for SegFormer-B0 under size-matched plain B (seed 0), ascending.}\label{tab:regions}
+\footnotesize\renewcommand{\arraystretch}{1.5}
+{\setlength{\textwidth}{\columnwidth}\fitbox{\columnwidth}{\input{generated/tab_regions.tex}}}
+\end{table}
 \begin{table*}[!t]\centering
 \caption{B-strict F1 (\%) of the landslide class, mean $\pm$ std over seeds ($^\dagger$ one seed, $^\ddagger$ two).}\label{tab:f1}
-\footnotesize
+\footnotesize\renewcommand{\arraystretch}{1.5}
 \fitbox{\textwidth}{\input{generated/tab_strict_f1.tex}}
 \end{table*}
 \begin{table*}[!t]\centering
 \caption{B-strict expected calibration error (pixel-level, 15 bins), mean $\pm$ std over seeds ($^\dagger$ one seed, $^\ddagger$ two).}\label{tab:ece}
-\footnotesize
+\footnotesize\renewcommand{\arraystretch}{1.5}
 \fitbox{\textwidth}{\input{generated/tab_strict_ece.tex}}
 \end{table*}
-\begin{table}[!t]\centering
+\begin{table}[!tb]\centering
 \caption{B-strict landslide \iou{} (\%) per seed.}\label{tab:perseed}
-\footnotesize
+\footnotesize\renewcommand{\arraystretch}{1.5}
 \fitbox{\columnwidth}{\input{generated/tab_perseed.tex}}
-\end{table}
-\begin{table}[!t]\centering
-\caption{Per-region or per-event landslide \iou{} (\%) for SegFormer-B0 under size-matched plain B (seed 0), ascending.}\label{tab:regions}
-\footnotesize
-{\setlength{\textwidth}{\columnwidth}\fitbox{\columnwidth}{\input{generated/tab_regions.tex}}}
 \end{table}
 
 \section{Event assignment}\label{app:events}
-\begin{table}[!t]\centering
+\begin{table}[!tb]\centering
 \caption{Documented physical events per dataset (T: tiles carry the event identifier; D: listed in the dataset paper only). Source: \texttt{configs/dataset\_events.json}; some assignments are inferred from place names.}\label{tab:events}
-\footnotesize
+\footnotesize\renewcommand{\arraystretch}{1.5}
 \fitbox{\columnwidth}{\input{generated/tab_events.tex}}
 \end{table}
 
 \section{Settings}
 \begin{table*}[!t]\centering
 \caption{Training settings.}\label{tab:hparams}
-\footnotesize
+\footnotesize\renewcommand{\arraystretch}{1.5}
 \fitbox{\textwidth}{\input{generated/tab_hparams.tex}}
 \end{table*}
 
@@ -296,7 +296,7 @@ Under an event-isolated leave-one-dataset-out protocol over five public datasets
 Table~\ref{tab:channels} gives mean channel values of the HR-GLDD arrays and of LMHLD scenes whose order is documented as B,G,R,NIR. For HR-GLDD the ordering of the first three channel means (channel~1 $<$ channel~3 $<$ channel~2) is the one that B,G,R would give in one PlanetScope scene (Hokkaido: B $<$ R $<$ G) but not in the other (Taiwan: B $<$ G $<$ R), and values are on different scales (reflectance fractions against digital numbers). The statistics are therefore weak evidence. The decisive evidence is the transfer result in Section~\ref{sec:dataissues}, which supports the B,G,R,NIR mapping only in the sense that it works much better than R,G,B,NIR; we did not test other permutations.
 \begin{table*}[!t]\centering
 \caption{Mean channel values (HR-GLDD: reflectance fractions in array order; LMHLD: digital numbers in documented B,G,R,NIR order).}\label{tab:channels}
-\footnotesize
+\footnotesize\renewcommand{\arraystretch}{1.5}
 \fitbox{\textwidth}{\input{generated/tab_channels.tex}}
 \end{table*}
 
