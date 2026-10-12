@@ -1,0 +1,18 @@
+\begin{tabular}{llrrrrr}
+\toprule
+Protocol & Held-out & \multicolumn{5}{c}{Training tiles from source dataset} \\
+ & & L4S & HR-GLDD & GDCLD & LMHLD & CAS \\
+\midrule
+B & L4S & -- & 1{,}119 & 11{,}162 & 17{,}753 & 14{,}687 \\
+B & HR-GLDD & 3{,}799 & -- & 11{,}162 & 17{,}753 & 14{,}687 \\
+B & GDCLD & 3{,}799 & 1{,}119 & -- & 17{,}753 & 14{,}687 \\
+B & LMHLD & 3{,}799 & 1{,}119 & 11{,}162 & -- & 14{,}687 \\
+B & CAS & 3{,}799 & 1{,}119 & 11{,}162 & 17{,}753 & -- \\
+\midrule
+B-strict & L4S & -- & -- & -- & 8{,}363 & 13{,}203 \\
+B-strict & HR-GLDD & -- & -- & -- & 11{,}811 & 13{,}203 \\
+B-strict & GDCLD & -- & -- & -- & 14{,}500 & 4{,}709 \\
+B-strict & LMHLD & -- & -- & -- & -- & 5{,}526 \\
+B-strict & CAS & -- & -- & -- & 12{,}678 & -- \\
+\bottomrule
+\end{tabular}

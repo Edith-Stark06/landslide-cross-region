@@ -44,24 +44,29 @@ ax.set_title("B-strict: mean over seeds (bars), individual seeds (dots), sample 
 fig.tight_layout(); fig.savefig(FIG / "fig_strict_bars.png", dpi=220); plt.close(fig)
 
 # ---------------------------------------------------------------- overlap control
-fig, ax = plt.subplots(figsize=(7.2, 3.4))
-labs = [("plainB", "Plain B (events may overlap)", "#ff7f0e"), ("sized", "Plain B, cut to B-strict size", "#bcbd22"), ("strict", "B-strict (events removed)", "#1f77b4")]
+fig, ax = plt.subplots(figsize=(8.4, 3.6))
+labs = [("plainB", "Plain B (all other datasets; events may overlap)", "#ff7f0e"), ("sized", "Plain B, size-matched", "#bcbd22"),
+        ("comp", "Composition-matched (LMHLD+CAS; events may overlap)", "#9467bd"), ("strict", "B-strict (LMHLD+CAS; events removed)", "#1f77b4")]
+bw = 0.2
 for j, (fam, lab, col) in enumerate(labs):
     first = True
     for i, d in enumerate(DS):
         v = R.get((fam, "seg", d), {}).get(0)
         if v is None:
             continue
-        ax.bar(i + (j - 1) * 0.27, 100 * v["iou_landslide"], 0.25, color=col, label=lab if first else None)
+        x0 = i + (j - 1.5) * bw
+        ax.bar(x0, 100 * v["iou_landslide"], bw * 0.95, color=col, label=lab if first else None)
         first = False
-for i, d in enumerate(DS):
-    v = [100 * x["iou_landslide"] for x in R[("strict", "seg", d)].values()]
-    m, sd = np.mean(v), np.std(v, ddof=1)
-    ax.errorbar(i + 0.27, m, yerr=sd, fmt="D", color="k", ms=3, capsize=2, lw=0.8, label="B-strict, 3-seed mean $\\pm$ std" if i == 0 else None)
-ax.text(1 - 0.27, 1.5, "n/a", ha="center", fontsize=7)
+        if fam in ("comp", "strict"):                                  # three-seed mean +- std for the two conditions that have seeds
+            vs = [100 * x["iou_landslide"] for x in R[(fam, "seg", d)].values()]
+            if len(vs) > 1:
+                ax.errorbar(x0, np.mean(vs), yerr=np.std(vs, ddof=1), fmt="D", color="k", ms=3, capsize=2, lw=0.8,
+                            label="3-seed mean $\\pm$ std" if (fam == "comp" and i == 0) else None)
+ax.text(1 - 1.5 * bw, 1.5, "n/a", ha="center", fontsize=7)
 ax.set_xticks(range(len(DS))); ax.set_xticklabels([LAB[d] for d in DS])
 ax.set_ylabel("landslide IoU (%), SegFormer-B0")
-ax.legend(fontsize=7, frameon=False)
-ax.set_title("Event-overlap control (bars: seed 0; plain B for HR-GLDD not reported, wrong channel order)", fontsize=8)
+ax.set_ylim(0, 66)
+ax.legend(fontsize=6.5, frameon=False, ncol=2, loc="upper left")
+ax.set_title("Event-overlap controls (bars: seed 0; diamonds: mean $\\pm$ std over seeds; plain B for HR-GLDD not reported)", fontsize=8)
 fig.tight_layout(); fig.savefig(FIG / "fig_overlap.png", dpi=220); plt.close(fig)
 print("wrote fig_strict_bars.png, fig_overlap.png")

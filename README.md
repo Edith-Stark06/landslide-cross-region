@@ -35,6 +35,21 @@ The tables read `results/runs/*/result.json`; each file holds the config, seed, 
 metrics (with per-event breakdowns where events are known). Superseded runs made with a wrong HR-GLDD channel order are in
 `results/runs_superseded/` and are excluded.
 
+## The manuscript
+
+`paper/manuscript.tex` is the paper source; every number in it is a macro generated from the result files, so none is typed by hand.
+
+| Step | Command |
+|---|---|
+| Regenerate macros, tables and the bibliography | `$PY -I scripts/make_paper_assets.py` |
+| Regenerate figures | `$PY -I scripts/make_figures.py; $PY -I scripts/make_figures_paper.py; $PY -I scripts/make_fig_data.py` |
+| Integrity check (undefined macros, citations, labels, literal numbers to audit) | `$PY -I scripts/lint_manuscript.py` |
+| Readable preview without LaTeX | `$PY -I scripts/make_preview.py` -> `paper/manuscript_preview.md` |
+| Build the PDF | `cd paper && tectonic manuscript.tex` (or upload `paper/` to Overleaf). The class and package files must be available to your LaTeX installation; the preamble uses only `article`, `amsmath`, `amssymb`, `graphicx`, `booktabs`, `multirow`, `array`, `xcolor`, `url` and `cite`. |
+
+Numbers quoted from other papers are kept in `paper/literature_values.json` with their provenance; reference verification status is in `paper/references.json`.
+`paper/REVIEWER_NOTES.md` is a candid self-review.
+
 ## Re-running the experiments
 
 1. `scripts/zenodo_get.ps1` downloads and MD5-checks the Zenodo records (L4S 10463239, HR-GLDD 7189381, GDCLD 13612636, LMHLD 17258777,

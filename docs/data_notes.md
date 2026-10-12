@@ -1,4 +1,4 @@
-# Data notes (observations made by inspecting the files on 2026-10-10)
+﻿# Data notes (observations made by inspecting the files on 2026-10-10)
 
 Everything here was read from the downloaded, MD5-verified archives unless marked otherwise. Processed tiles live in
 `F:\LandslideData\processed\<dataset>\{images.npy,masks.npy,meta.csv}`; raw archives in `F:\LandslideData\raw`.
@@ -12,7 +12,7 @@ Everything here was read from the downloaded, MD5-verified archives unless marke
 | CAS Landslide (Zenodo 10294997) | 17 zips (region x sensor), each `img/`, `label/` (0/255 visual), `mask/` ({0,1}); extensions `.tif` or `.TIF` | RGB, 512 px | 256 (box average) | yes. 16 zips = **10 physical regions**; several regions appear in 2-3 sensors (Moxitaidi SAT/UAV-0.6/UAV-1, Tiburon Sentinel/Planet, ...) so groups are regions, not zips. README says 22,049 images; Zenodo description and the files give 20,865 |
 
 ## Consequences for the protocols
-- **A (in-dataset).** L4S, HR-GLDD, GDCLD use the official splits. LMHLD uses its per-event official splits, which are *tile-level inside each event*: all 7 events appear in both train and test, so LMHLD protocol A is **not** event-isolated (the leakage report shows 7 straddling groups). CAS ships no split; we use a deterministic region-level 70/15/15 split (not comparable to prior work). The GDCLD test events (Lushan, Mesetas, Palu, Sumatra) are also among the nine events the train/val tiles come from, so GDCLD protocol A is **probably not** event-isolated either (which train tiles belong to which event is unknown).
+- **A (in-dataset).** L4S, HR-GLDD, GDCLD use the official splits. LMHLD uses its per-event official splits, which are *tile-level inside each event*: all 7 events appear in both train and test, so LMHLD protocol A is **not** event-isolated (the leakage report shows 7 straddling groups). CAS ships no split; we use a deterministic region-level 70/15/15 split (not comparable to prior work). GDCLD (CORRECTED 2026-10-12): the dataset paper (read via a retrieval tool) describes training and validation tiles drawn at 3:1 from five events (Luding, Jiuzhaigou, Hokkaido, Mainling, Nippes) and the test images from four other events (Lushan, Mesetas, Sumatra, Palu). So its test split is event-isolated from its training data while its validation split shares events with training; we cannot verify this because its train/val tiles carry no event id. An earlier version of this note said the test events were probably also in the training tiles; that was wrong.
 - **B (leave-one-dataset-out).** Valid at dataset level, but the *same physical event appears in several datasets* (Hokkaido 2018 in all five, Wenchuan 2008 in three, Nepal 2015 in three, Haiti 2021 and Palu 2018 in two to three, ...; see `configs/dataset_events.json`). So we also build **B-strict**, which removes training tiles/datasets that share a documented event with the held-out dataset. B-strict shrinks training data a lot (e.g. holding out LMHLD leaves 5,526 train tiles); event membership partly relies on my reading of place names (marked `inferred`).
 - **C (leave-one-event-out).** Only where every tile has a known group: **LMHLD (7 events) and CAS (10 regions)**. Validation is one other whole group; no tile-level val. Not possible for L4S, HR-GLDD or GDCLD.
 - **D (sensor transfer).** Not built yet; candidates: train on PlanetScope-type sets (HR-GLDD, LMHLD Hokkaido/Taiwan) and test on Sentinel-2 (L4S, LMHLD Emilia-Romagna/Gorkha).
@@ -28,3 +28,11 @@ The paper text says R,G,B,NIR, but channel means (0.109 / 0.150 / 0.140 / 0.500)
 
 ### Result of the corrected-order rerun (2026-10-11)
 B-strict, held-out HR-GLDD, landslide IoU: SegFormer-B0 2.6 -> 36.7, U-Net 2.2 -> 29.9 after mapping HR-GLDD as B,G,R,NIR. The mapping was changed from channel statistics before this rerun, not tuned on it. The array order is therefore very likely B,G,R,NIR, though it is still not documented by the source. The old B-strict HR-GLDD runs are in results/runs_superseded/. Plain-B runs (xd_B_segformer_b0__*) used the old order for HR-GLDD training tiles (about 3% of each training set) and for the holdout_hrgldd test fold; the latter is not comparable with fixed-order runs.
+
+## B-strict training composition (added 2026-10-12)
+Because Hokkaido 2018 is in all five datasets and L4S, HR-GLDD and GDCLD carry no tile-level event id, **every B-strict fold trains only on LMHLD and CAS tiles** (see scripts/fold_composition.py). The earlier size-matched control matched only the number of tiles; a composition-matched control (splits/protocol_Bcomp.json) was added to separate the effect of event overlap from the effect of the training sources.
+
+
+## B-strict training composition (added 2026-10-12)
+Because Hokkaido 2018 is in all five datasets and L4S, HR-GLDD and GDCLD carry no tile-level event id, **every B-strict fold trains only on LMHLD and CAS tiles** (see scripts/fold_composition.py). The earlier size-matched control matched only the number of tiles; a composition-matched control (splits/protocol_Bcomp.json) was added to separate the effect of event overlap from the effect of the training sources.
+

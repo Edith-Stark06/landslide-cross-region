@@ -5,7 +5,8 @@ INFO[(family, method, dataset)][seed] -> run-level info (params, gflops, best_va
 
 families:  strict   B-strict (event-isolated leave-one-dataset-out), held-out dataset = `dataset`
            plainB   plain leave-one-dataset-out (events may overlap)      [HR-GLDD fold excluded: wrong channel order]
-           sized    plain B with the training set cut to the B-strict size
+           sized    plain B with the training set cut to the B-strict size (sources: all four other datasets)
+           comp     composition-matched: same source datasets (LMHLD, CAS) and size as B-strict, events NOT removed
            inds     in-dataset (protocol A); `method` encodes input and model, e.g. 'l4s14_unet'
 methods:   unet, seg (SegFormer-B0 RGB), adp (SegFormer-B0 + band adapter), kd (distilled SegFormer-B0 student)
 Excluded on purpose: results/runs_superseded/* (wrong HR-GLDD order); plain-B HR-GLDD fold.
@@ -26,7 +27,7 @@ NAME_MAP = {
     "xd_Bstrict_unet": ("strict", "unet"), "xd_Bstrict_fixbgr_unet": ("strict", "unet"),
     "xd_Bstrict_segformer_b0": ("strict", "seg"), "xd_Bstrict_fixbgr_segformer_b0": ("strict", "seg"),
     "xd_Bstrict_adapter_segformer_b0": ("strict", "adp"), "xd_Bstrict_kd_segformer_b0": ("strict", "kd"),
-    "xd_B_segformer_b0": ("plainB", "seg"), "xd_Bsized_segformer_b0": ("sized", "seg"),
+    "xd_B_segformer_b0": ("plainB", "seg"), "xd_Bsized_segformer_b0": ("sized", "seg"), "xd_Bcomp_segformer_b0": ("comp", "seg"),
     "baseline_l4s_unet": ("inds", "l4s14_unet"), "baseline_l4s_deeplabv3plus": ("inds", "l4s14_deeplab"),
     "baseline_l4s_segformer_b0": ("inds", "l4s14_seg"),
     "inds_l4s_rgb_unet": ("inds", "l4srgb_unet"), "inds_l4s_rgb_segformer_b0": ("inds", "l4srgb_seg"),

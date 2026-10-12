@@ -132,17 +132,35 @@ for fam, tag in (("plainB", "Plain"), ("sized", "Sized")):
             if 0 in v:
                 put(f"{tag}{mn}{DSN[ds]}Z", f"{v[0]:.{nd}f}")
 OVL = {}
+HAVE_COMP = all(("comp", "seg", d) in R for d in DS)
+for key, (mn, scale, nd) in MET.items():                         # composition-matched control (seeds 0..2)
+    for ds in DS:
+        stat_macros(f"Comp{mn}{DSN[ds]}", vals("comp", "seg", ds, key, scale), nd)
+    stat_macros(f"Comp{mn}All", all_per_seed("comp", "seg", key, scale), nd)
 for ds in DS:
     p = vals("plainB", "seg", ds, "iou_landslide", 100).get(0)
     z = vals("sized", "seg", ds, "iou_landslide", 100).get(0)
+    c = vals("comp", "seg", ds, "iou_landslide", 100).get(0)
     st = vals("strict", "seg", ds, "iou_landslide", 100).get(0)
-    OVL[ds] = (p, z, st)
+    OVL[ds] = (p, z, c, st)
     if None not in (p, z, st):
         put(f"OvlTotal{DSN[ds]}", f"{p - st:.1f}")
         put(f"OvlData{DSN[ds]}", f"{p - z:.1f}")
-        put(f"OvlEvents{DSN[ds]}", f"{z - st:.1f}")
     if z is not None and st is not None:
         put(f"OvlSizedMinusStrict{DSN[ds]}", sg(z - st))
+    if None not in (z, c):
+        put(f"OvlSource{DSN[ds]}", num(z - c))                     # seed 0: sized plain B minus composition-matched = effect of losing the other source datasets
+    if None not in (c, st):
+        put(f"OvlEvents{DSN[ds]}", sg(c - st))                     # seed 0: composition-matched -> B-strict = removing event-sharing tiles only
+    cm, sm = vals("comp", "seg", ds, "iou_landslide", 100), vals("strict", "seg", ds, "iou_landslide", 100)
+    if cm and sm:                                                  # seed means (all available seeds)
+        d_ = float(np.mean(list(cm.values()))) - float(np.mean(list(sm.values())))
+        put(f"OvlEventsSeeds{DSN[ds]}", sg(d_))
+        put(f"OvlEventsSeedsAbs{DSN[ds]}", f"{abs(d_):.1f}")
+if HAVE_COMP:
+    pairs = {ds: float(np.mean(list(vals("comp", "seg", ds, "iou_landslide", 100).values()))) - float(np.mean(list(vals("strict", "seg", ds, "iou_landslide", 100).values()))) for ds in DS}
+    put("OvlEventsSeedsPos", sum(v > 0 for v in pairs.values()))
+    put("OvlEventsSeedsMean", sg(float(np.mean(list(pairs.values())))))
 
 # ---------------------------------------------------------------- in-dataset (protocol A, single seed)
 IND = {"l4s14_unet": ("Lfs", "Fourteen", "Unet"), "l4s14_deeplab": ("Lfs", "Fourteen", "Deeplab"), "l4s14_seg": ("Lfs", "Fourteen", "Seg"),
@@ -324,17 +342,30 @@ for key, tag, scale, nd in (("iou_landslide", "iou", 100, 1), ("f1", "f1", 100, 
     t += ["\\bottomrule", "\\end{tabular}"]
     write(f"tab_strict_{tag}.tex", "\n".join(t) + "\n")
 
-# overlap control
-t = ["\\begin{tabular}{lccccc}", "\\toprule", "Held-out & Plain B & Plain B, size-matched & B-strict & \\multicolumn{2}{c}{Difference attributable to} \\\\",
-     " & (seed 0) & (seed 0) & (seed 0) & training-set size & shared events \\\\", "\\midrule"]
+# overlap controls: four training conditions. Plain B and size-matched are single seed (0); the other two have three seeds.
+t = ["\\begin{tabular}{lcccc}", "\\toprule",
+     "Held-out & Plain B & Plain B, size-matched & Composition-matched & B-strict \\\\",
+     " & (all 4 other datasets) & (all 4 other datasets) & (LMHLD + CAS only) & (LMHLD + CAS only) \\\\",
+     " & events kept, seed 0 & events kept, seed 0 & events kept & events removed \\\\", "\\midrule"]
+f = lambda x: "n/a" if x is None else num(x)  # noqa: E731
 for ds in DS:
-    p, z, st = OVL[ds]
-    f = lambda x: "n/a" if x is None else num(x)  # noqa: E731
-    dd = "n/a" if None in (p, z) else num(p - z)
-    de = "n/a" if None in (z, st) else num(z - st)
-    t.append(f"{DSL[ds]} & {f(p)} & {f(z)} & {f(st)} & {dd} & {de} \\\\")
+    p, z, c, st = OVL[ds]
+    t.append(f"{DSL[ds]} & {f(p)} & {f(z)} & {cellstat(vals('comp', 'seg', ds, 'iou_landslide', 100))} & {cellstat(vals('strict', 'seg', ds, 'iou_landslide', 100))} \\\\")
 t += ["\\bottomrule", "\\end{tabular}"]
 write("tab_overlap.tex", "\n".join(t) + "\n")
+t = ["\\begin{tabular}{lcccc}", "\\toprule", "Held-out & Events kept (composition-matched) & Events removed (B-strict) & Difference of means & Seed std (kept / removed) \\\\", "\\midrule"]
+for ds in DS:
+    cm, sm = vals("comp", "seg", ds, "iou_landslide", 100), vals("strict", "seg", ds, "iou_landslide", 100)
+    if cm and sm:
+        dm = float(np.mean(list(cm.values()))) - float(np.mean(list(sm.values())))
+        t.append(f"{DSL[ds]} & {np.mean(list(cm.values())):.1f} & {np.mean(list(sm.values())):.1f} & {sg(dm)} & {np.std(list(cm.values()), ddof=1):.1f} / {np.std(list(sm.values()), ddof=1):.1f} \\\\")
+    else:
+        t.append(f"{DSL[ds]} & n/a & n/a & n/a & \\\\")
+if HAVE_COMP:
+    t.append("\\midrule")
+    t.append(f"Mean over datasets & {MAC.get('CompIouAllM', 'n/a')} & {MAC.get('SegIouAllM', 'n/a')} & {MAC.get('OvlEventsSeedsMean', 'n/a')} & {MAC.get('CompIouAllS', 'n/a')} / {MAC.get('SegIouAllS', 'n/a')} \\\\")
+t += ["\\bottomrule", "\\end{tabular}"]
+write("tab_overlap_seeds.tex", "\n".join(t) + "\n")
 
 # teacher vs student
 t = ["\\begin{tabular}{lcccc}", "\\toprule", "Held-out & Teacher B3+LoRA (seed 0) & Student, KD & Student, no KD (seed 0) & Student, no KD (mean of seeds) \\\\", "\\midrule"]
@@ -424,6 +455,21 @@ for e_ in sorted(allev, key=lambda x: (-cnt[x], x)):
     t.append(f"{esc(e_)} & " + " & ".join(cells) + " \\\\")
 t += ["\\bottomrule", "\\end{tabular}"]
 write("tab_events.tex", "\n".join(t) + "\n")
+
+# training composition per fold (B and B-strict)
+from collections import Counter  # noqa: E402
+t = ["\\begin{tabular}{llrrrrr}", "\\toprule", "Protocol & Held-out & \\multicolumn{5}{c}{Training tiles from source dataset} \\\\",
+     " & & " + " & ".join(DSL[d] for d in DS) + " \\\\", "\\midrule"]
+for lab, spl in (("B", bp), ("B-strict", bs)):
+    for ds in DS:
+        c = Counter(r[0] for r in spl["holdout_" + ds]["train"])
+        t.append(f"{lab} & {DSL[ds]} & " + " & ".join(f"{c.get(d, 0):,}".replace(",", "{,}") if c.get(d, 0) else "--" for d in DS) + " \\\\")
+    if lab == "B":
+        t.append("\\midrule")
+t += ["\\bottomrule", "\\end{tabular}"]
+write("tab_composition.tex", "\n".join(t) + "\n")
+srcs = {ds: sorted({r[0] for r in bs["holdout_" + ds]["train"]}) for ds in DS}
+put("StrictOnlyLmhCas", "yes" if all(set(v) <= {"lmhld", "cas"} for v in srcs.values()) else "no")
 
 # hyper-parameters
 t = ["\\begin{tabular}{lll}", "\\toprule", "Setting & Cross-dataset runs (B, B-strict) & In-dataset runs (A) \\\\", "\\midrule",

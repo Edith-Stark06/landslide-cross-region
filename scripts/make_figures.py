@@ -100,7 +100,9 @@ else:
     print("no reliability data yet: fig_reliability.png skipped")
 
 # ---------------------------------------------------------------- failures
-ex = sorted(RUNS.glob("*/examples_*.npz"))
+# pinned to the run described in the manuscript (held-out CAS, band-adapter model, seed 1); never "first file found"
+PIN = RUNS / "xd_Bstrict_adapter_segformer_b0__holdout_cas__holdout_cas__seed1" / "examples_cas.npz"
+ex = [PIN] if PIN.exists() else []
 if ex:
     f = ex[0]
     z = np.load(f)

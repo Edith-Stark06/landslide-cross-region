@@ -51,3 +51,5 @@ Running total after seeds-a (2.7 h) and seeds-b (2.8 h): **~16.6 h** measured (+
 
 
 | 2026-10-12 | comp-a, comp-b (composition-matched control: SegFormer-B0, B-strict training sources LMHLD+CAS and size, events NOT removed; 5 folds x seeds 0,1,2 = 15 runs) | 15 | LAUNCHED. Estimate ~1.6 h total (15 x measured mean 388 s B-strict SegFormer fold + start-up), split over two kernels; cap 2,400 s per run | pending |
+
+| 2026-10-12 | comp-a 4,619 s + comp-b 2,488 s job time = 7,107 s + ~2 min start-up = ~2.0 h (estimate 1.6 h); 15/15 runs completed | measured running total ~18.6 h (+ hung smoke <= 6 h); remaining of 30 h ~11.4 h (5.4 h worst case) |
